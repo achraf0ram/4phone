@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
@@ -10,42 +9,42 @@ const Repairs = () => {
       icon: Phone,
       title: "إصلاح الشاشة",
       description: "استبدال شاشات الهواتف المكسورة بقطع أصلية مع ضمان 6 أشهر",
-      price: "من 150 ريال",
+      price: "من 150 درهم",
       gradient: "from-blue-500 to-purple-600"
     },
     {
       icon: Wrench,
       title: "إصلاح البطارية",
       description: "استبدال بطاريات الهواتف المنتفخة أو التالفة ببطاريات أصلية",
-      price: "من 120 ريال",
+      price: "من 120 درهم",
       gradient: "from-green-500 to-blue-500"
     },
     {
       icon: Phone,
       title: "إصلاح الكاميرا",
       description: "إصلاح مشاكل الكاميرا الأمامية والخلفية وتحسين جودة الصور",
-      price: "من 200 ريال",
+      price: "من 200 درهم",
       gradient: "from-purple-500 to-pink-500"
     },
     {
       icon: Wrench,
       title: "إصلاح الصوت",
       description: "حل مشاكل السماعات والميكروفون وجودة الصوت",
-      price: "من 100 ريال",
+      price: "من 100 درهم",
       gradient: "from-orange-500 to-red-500"
     },
     {
       icon: Phone,
       title: "إصلاح الشحن",
       description: "إصلاح منافذ الشحن ومشاكل عدم الشحن أو الشحن البطيء",
-      price: "من 80 ريال",
+      price: "من 80 درهم",
       gradient: "from-teal-500 to-green-500"
     },
     {
       icon: Wrench,
       title: "إصلاح الأزرار",
       description: "إصلاح أزرار الصوت والطاقة والهوم بوتن وجميع الأزرار",
-      price: "من 90 ريال",
+      price: "من 90 درهم",
       gradient: "from-indigo-500 to-purple-500"
     }
   ];

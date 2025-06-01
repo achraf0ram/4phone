@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
@@ -14,7 +13,7 @@ const Index = () => {
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 bg-clip-text text-transparent">
-              مرحباً بك في 4
+              مرحباً بك في 4points
             </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">

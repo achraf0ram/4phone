@@ -10,8 +10,8 @@ const Parts = () => {
     {
       id: 1,
       name: "شاشة iPhone 14 Pro",
-      price: "750 ريال",
-      originalPrice: "900 ريال",
+      price: "750 درهم",
+      originalPrice: "900 درهم",
       image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=400&h=300&fit=crop",
       rating: 4.9,
       inStock: true
@@ -19,8 +19,8 @@ const Parts = () => {
     {
       id: 2,
       name: "بطارية Samsung Galaxy S23",
-      price: "180 ريال",
-      originalPrice: "220 ريال",
+      price: "180 درهم",
+      originalPrice: "220 درهم",
       image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop",
       rating: 4.8,
       inStock: true
@@ -28,8 +28,8 @@ const Parts = () => {
     {
       id: 3,
       name: "كاميرا خلفية Xiaomi Mi 11",
-      price: "320 ريال",
-      originalPrice: "400 ريال",
+      price: "320 درهم",
+      originalPrice: "400 درهم",
       image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop",
       rating: 4.7,
       inStock: false
@@ -37,8 +37,8 @@ const Parts = () => {
     {
       id: 4,
       name: "سماعة داخلية Huawei P40",
-      price: "95 ريال",
-      originalPrice: "120 ريال",
+      price: "95 درهم",
+      originalPrice: "120 درهم",
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
       rating: 4.6,
       inStock: true
