@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
-import { Phone, Wrench, ShoppingCart, Star, Users, Clock } from 'lucide-react';
+import { Phone, Wrench, ShoppingCart, Star, Users, Clock, MapPin, Mail } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -14,11 +14,11 @@ const Index = () => {
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 bg-clip-text text-transparent">
-              مرحباً بك في فيكس فون
+              مرحباً بك في 4
             </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية بأفضل الأسعار وأعلى جودة في الخدمة
+            منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة
           </p>
           
           <div className="flex flex-wrap justify-center gap-4 mt-8">
@@ -28,6 +28,44 @@ const Index = () => {
             <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-blue-500 hover:text-blue-500 transition-all duration-300">
               تصفح قطع الغيار
             </button>
+          </div>
+        </div>
+
+        {/* Contact and Address Section */}
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-16">
+          <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">
+            معلومات التواصل
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex items-center space-x-4 space-x-reverse">
+              <div className="bg-gradient-to-r from-blue-500 to-green-500 p-3 rounded-lg">
+                <Phone className="text-white" size={24} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800">رقم الهاتف</h3>
+                <p className="text-gray-600">+212 6 12 34 56 78</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4 space-x-reverse">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-lg">
+                <Mail className="text-white" size={24} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800">البريد الإلكتروني</h3>
+                <p className="text-gray-600">info@4phone.ma</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4 space-x-reverse md:col-span-2">
+              <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-lg">
+                <MapPin className="text-white" size={24} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800">العنوان</h3>
+                <p className="text-gray-600">شارع الحسن الثاني، الرباط، المغرب</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -59,11 +97,12 @@ const Index = () => {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <ServiceCard
             icon={Wrench}
             title="خدمات الإصلاح"
             description="إصلاح احترافي لجميع أنواع الهواتف الذكية بضمان شامل وقطع غيار أصلية"
+            price="ابتداءً من 50 درهم"
             gradient="from-blue-500 to-purple-600"
           />
           
@@ -71,6 +110,7 @@ const Index = () => {
             icon={ShoppingCart}
             title="بيع قطع الغيار"
             description="قطع غيار أصلية ومضمونة لجميع أنواع الهواتف بأفضل الأسعار"
+            price="ابتداءً من 20 درهم"
             gradient="from-green-500 to-blue-500"
           />
           
@@ -78,7 +118,16 @@ const Index = () => {
             icon={Phone}
             title="شراء الهواتف"
             description="نشتري هواتفك المستعملة بأفضل الأسعار مع تقييم فوري وعادل"
+            price="حتى 5000 درهم"
             gradient="from-purple-500 to-pink-500"
+          />
+
+          <ServiceCard
+            icon={Phone}
+            title="الهواتف المستعملة"
+            description="هواتف مستعملة مفحوصة ومضمونة بأفضل الأسعار وجودة عالية"
+            price="ابتداءً من 800 درهم"
+            gradient="from-orange-500 to-red-500"
           />
         </div>
       </section>

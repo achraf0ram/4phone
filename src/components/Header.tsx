@@ -17,7 +17,7 @@ const Header = () => {
               <Phone className="text-white" size={24} />
             </div>
             <span className="bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">
-              فيكس فون
+              4
             </span>
           </Link>
           
