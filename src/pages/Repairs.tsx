@@ -25,6 +25,10 @@ const Repairs = () => {
     alert('تم إرسال طلبك بنجاح! سنتواصل معك قريباً');
   };
 
+  const handleExampleClick = (example: string) => {
+    setProblemDescription(example);
+  };
+
   const commonProblems = [
     "الشاشة مكسورة أو متشققة",
     "الهاتف لا يشحن أو يشحن ببطء",
@@ -151,13 +155,30 @@ const Repairs = () => {
               />
             </div>
 
+            {/* Common Problems Examples */}
+            <div>
+              <Label className="text-gray-700 font-medium mb-4 block">أمثلة للمشاكل الشائعة</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                {commonProblems.map((problem, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleExampleClick(problem)}
+                    className="text-right p-3 bg-gray-50 rounded-lg hover:bg-blue-50 hover:border-blue-200 border border-gray-200 transition-colors text-sm text-gray-700 hover:text-blue-600"
+                  >
+                    {problem}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div>
               <Label htmlFor="problemDescription" className="text-gray-700 font-medium">وصف المشكلة</Label>
               <Textarea
                 id="problemDescription"
                 value={problemDescription}
                 onChange={(e) => setProblemDescription(e.target.value)}
-                placeholder="اشرح بالتفصيل ما هي المشكلة التي تواجهها مع هاتفك..."
+                placeholder="اشرح بالتفصيل ما هي المشكلة التي تواجهها مع هاتفك... أو اختر من الأمثلة أعلاه"
                 required
                 className="mt-2 min-h-[120px]"
               />
@@ -165,31 +186,11 @@ const Repairs = () => {
 
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg"
+              className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-bold py-4 px-6 rounded-lg text-lg"
             >
-              إرسال طلب الإصلاح
+              طلب إصلاح هاتفك
             </Button>
           </form>
-        </div>
-
-        {/* Common Problems Examples */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-20 max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="text-white" size={32} />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">أمثلة على المشاكل الشائعة</h3>
-            <p className="text-gray-600">يمكنك الاستعانة بهذه الأمثلة لوصف مشكلتك</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {commonProblems.map((problem, index) => (
-              <div key={index} className="flex items-center space-x-3 space-x-reverse p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-green-500 rounded-full"></div>
-                <span className="text-gray-700">{problem}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Process Steps */}
