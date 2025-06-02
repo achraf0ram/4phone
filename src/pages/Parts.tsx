@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
-import { Phone, ShoppingCart, Star, Search, ArrowRight } from 'lucide-react';
+import { Phone, ShoppingCart, Star, Search, ArrowRight, Upload, X } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
 
 interface PartsProps {
@@ -10,6 +10,19 @@ interface PartsProps {
 
 const Parts: React.FC<PartsProps> = ({ language, onLanguageChange }) => {
   const [activeTab, setActiveTab] = useState('buy');
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newImages = Array.from(files);
+      setUploadedImages(prev => [...prev, ...newImages].slice(0, 5)); // Max 5 images
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+  };
 
   const partsForSale = [
     {
@@ -264,6 +277,65 @@ const Parts: React.FC<PartsProps> = ({ language, onLanguageChange }) => {
                     ></textarea>
                   </div>
                 </div>
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="mt-8">
+                <label className="block text-gray-700 font-semibold mb-4">
+                  {language === 'ar' ? 'صور الهاتف (اختياري - حتى 5 صور)' : 'Photos du téléphone (optionnel - jusqu\'à 5 photos)'}
+                </label>
+                
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="phone-images"
+                    disabled={uploadedImages.length >= 5}
+                  />
+                  <label 
+                    htmlFor="phone-images" 
+                    className="cursor-pointer flex flex-col items-center space-y-4"
+                  >
+                    <Upload size={48} className="text-gray-400" />
+                    <div>
+                      <p className="text-lg font-semibold text-gray-600">
+                        {language === 'ar' ? 'اضغط لرفع الصور' : 'Cliquez pour télécharger les photos'}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        {language === 'ar' ? 'PNG, JPG, JPEG حتى 10MB لكل صورة' : 'PNG, JPG, JPEG jusqu\'à 10MB par photo'}
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Uploaded Images Preview */}
+                {uploadedImages.length > 0 && (
+                  <div className="mt-6">
+                    <h4 className="text-lg font-semibold text-gray-700 mb-4">
+                      {language === 'ar' ? 'الصور المرفوعة:' : 'Photos téléchargées:'}
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                      {uploadedImages.map((image, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={URL.createObjectURL(image)}
+                            alt={`Phone ${index + 1}`}
+                            className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                          />
+                          <button
+                            onClick={() => removeImage(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div className="mt-8 text-center">
