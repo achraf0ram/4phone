@@ -1,9 +1,17 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
 import { Phone, Wrench, ShoppingCart, Star, Users, Clock, MapPin, Mail, ArrowRight } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface IndexProps {
   language: Language;
@@ -11,6 +19,25 @@ interface IndexProps {
 }
 
 const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
+  const carouselImages = [
+    {
+      src: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=400&fit=crop",
+      alt: language === 'ar' ? "هواتف مستعملة" : "Téléphones d'occasion"
+    },
+    {
+      src: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800&h=400&fit=crop",
+      alt: language === 'ar' ? "قطع غيار أصلية" : "Pièces détachées originales"
+    },
+    {
+      src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop",
+      alt: language === 'ar' ? "خدمات الإصلاح" : "Services de réparation"
+    },
+    {
+      src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=400&fit=crop",
+      alt: language === 'ar' ? "فريق محترف" : "Équipe professionnelle"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <Header language={language} onLanguageChange={onLanguageChange} />
@@ -26,17 +53,57 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             {getTranslation(language, 'welcomeDescription')}
           </p>
-          
-          <div className="flex flex-wrap justify-center gap-4 mt-8">
+        </div>
+
+        {/* Carousel Section */}
+        <div className="mb-12 max-w-4xl mx-auto">
+          <Carousel className="w-full">
+            <CarouselContent>
+              {carouselImages.map((image, index) => (
+                <CarouselItem key={index}>
+                  <div className="relative">
+                    <img
+                      src={image.src}
+                      alt={image.alt}
+                      className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-20 rounded-xl"></div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+
+        {/* 4phone Description */}
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+            4phone
+          </h2>
+          <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
+            {language === 'ar' 
+              ? 'منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة'
+              : 'Votre plateforme complète pour la réparation de téléphones et la vente et l\'achat de pièces détachées originales et de téléphones d\'occasion aux meilleurs prix et avec la plus haute qualité de service'
+            }
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap justify-center gap-4 mb-16">
+          <Link to="/repairs">
             <button className="flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-xl font-semibold hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
               <ArrowRight size={20} />
               <span>{getTranslation(language, 'bookRepair')}</span>
             </button>
+          </Link>
+          <Link to="/parts">
             <button className="flex items-center space-x-2 px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-blue-500 hover:text-blue-500 transition-all duration-300">
               <ArrowRight size={20} />
               <span>{getTranslation(language, 'browseParts')}</span>
             </button>
-          </div>
+          </Link>
         </div>
 
         {/* Contact and Address Section */}
