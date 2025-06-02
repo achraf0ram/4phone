@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import Header from '@/components/Header';
-import { Phone, ShoppingCart, Star, Search, ArrowRight, Upload, X } from 'lucide-react';
+import ProductDetailsModal from '@/components/ProductDetailsModal';
+import { Phone, ShoppingCart, Star, Search, ArrowRight, Upload, X, Eye } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
 
 interface PartsProps {
@@ -8,15 +10,32 @@ interface PartsProps {
   onLanguageChange: (lang: string) => void;
 }
 
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  originalPrice: string;
+  image: string;
+  rating: number;
+  inStock: boolean;
+  description: string;
+  features: string[];
+  warranty: string;
+  brand: string;
+  compatibility: string[];
+}
+
 const Parts: React.FC<PartsProps> = ({ language, onLanguageChange }) => {
   const [activeTab, setActiveTab] = useState('buy');
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
       const newImages = Array.from(files);
-      setUploadedImages(prev => [...prev, ...newImages].slice(0, 5)); // Max 5 images
+      setUploadedImages(prev => [...prev, ...newImages].slice(0, 5));
     }
   };
 
@@ -24,42 +43,123 @@ const Parts: React.FC<PartsProps> = ({ language, onLanguageChange }) => {
     setUploadedImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const partsForSale = [
+  const openProductDetails = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const partsForSale: Product[] = [
     {
       id: 1,
-      name: language === 'ar' ? "شاشة iPhone 14 Pro" : "Écran iPhone 14 Pro",
+      name: language === 'ar' ? "شاشة iPhone 14 Pro OLED" : "Écran iPhone 14 Pro OLED",
       price: `750 ${getTranslation(language, 'currency')}`,
       originalPrice: `900 ${getTranslation(language, 'currency')}`,
       image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=400&h=300&fit=crop",
       rating: 4.9,
-      inStock: true
+      inStock: true,
+      description: language === 'ar' ? "شاشة OLED أصلية عالية الجودة لهاتف iPhone 14 Pro مع تقنية True Tone" : "Écran OLED original haute qualité pour iPhone 14 Pro avec technologie True Tone",
+      features: language === 'ar' ? ["تقنية OLED", "True Tone", "ضمان 6 أشهر", "تركيب مجاني"] : ["Technologie OLED", "True Tone", "Garantie 6 mois", "Installation gratuite"],
+      warranty: language === 'ar' ? "6 أشهر" : "6 mois",
+      brand: "Apple",
+      compatibility: ["iPhone 14 Pro"]
     },
     {
       id: 2,
-      name: language === 'ar' ? "بطارية Samsung Galaxy S23" : "Batterie Samsung Galaxy S23",
-      price: `180 ${getTranslation(language, 'currency')}`,
-      originalPrice: `220 ${getTranslation(language, 'currency')}`,
+      name: language === 'ar' ? "بطارية Samsung Galaxy S23 Ultra" : "Batterie Samsung Galaxy S23 Ultra",
+      price: `280 ${getTranslation(language, 'currency')}`,
+      originalPrice: `350 ${getTranslation(language, 'currency')}`,
       image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop",
       rating: 4.8,
-      inStock: true
+      inStock: true,
+      description: language === 'ar' ? "بطارية أصلية بسعة 5000mAh مع تقنية الشحن السريع" : "Batterie originale 5000mAh avec technologie de charge rapide",
+      features: language === 'ar' ? ["5000mAh", "شحن سريع", "ضمان سنة", "أدوات التركيب مرفقة"] : ["5000mAh", "Charge rapide", "Garantie 1 an", "Outils d'installation inclus"],
+      warranty: language === 'ar' ? "سنة واحدة" : "1 an",
+      brand: "Samsung",
+      compatibility: ["Galaxy S23 Ultra"]
     },
     {
       id: 3,
-      name: language === 'ar' ? "كاميرا خلفية Xiaomi Mi 11" : "Caméra arrière Xiaomi Mi 11",
-      price: `320 ${getTranslation(language, 'currency')}`,
-      originalPrice: `400 ${getTranslation(language, 'currency')}`,
+      name: language === 'ar' ? "كاميرا خلفية Xiaomi Mi 13 Pro" : "Caméra arrière Xiaomi Mi 13 Pro",
+      price: `420 ${getTranslation(language, 'currency')}`,
+      originalPrice: `520 ${getTranslation(language, 'currency')}`,
       image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop",
       rating: 4.7,
-      inStock: false
+      inStock: true,
+      description: language === 'ar' ? "كاميرا خلفية 50MP مع عدسة Leica وتقنية التثبيت البصري" : "Caméra arrière 50MP avec objectif Leica et stabilisation optique",
+      features: language === 'ar' ? ["50MP", "عدسة Leica", "تثبيت بصري", "وضع ليلي محسن"] : ["50MP", "Objectif Leica", "Stabilisation optique", "Mode nuit amélioré"],
+      warranty: language === 'ar' ? "8 أشهر" : "8 mois",
+      brand: "Xiaomi",
+      compatibility: ["Mi 13 Pro", "Mi 13"]
     },
     {
       id: 4,
-      name: language === 'ar' ? "سماعة داخلية Huawei P40" : "Sonore interne Huawei P40",
-      price: `95 ${getTranslation(language, 'currency')}`,
-      originalPrice: `120 ${getTranslation(language, 'currency')}`,
+      name: language === 'ar' ? "سماعة داخلية Huawei P50 Pro" : "Haut-parleur interne Huawei P50 Pro",
+      price: `150 ${getTranslation(language, 'currency')}`,
+      originalPrice: `200 ${getTranslation(language, 'currency')}`,
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
       rating: 4.6,
-      inStock: true
+      inStock: true,
+      description: language === 'ar' ? "سماعة داخلية عالية الجودة مع تقنية الصوت المحيطي" : "Haut-parleur interne haute qualité avec technologie surround",
+      features: language === 'ar' ? ["صوت عالي الجودة", "مقاوم للماء", "سهل التركيب", "ضمان 4 أشهر"] : ["Son haute qualité", "Résistant à l'eau", "Installation facile", "Garantie 4 mois"],
+      warranty: language === 'ar' ? "4 أشهر" : "4 mois",
+      brand: "Huawei",
+      compatibility: ["P50 Pro", "P50"]
+    },
+    {
+      id: 5,
+      name: language === 'ar' ? "شاشة OnePlus 11 AMOLED" : "Écran OnePlus 11 AMOLED",
+      price: `680 ${getTranslation(language, 'currency')}`,
+      originalPrice: `800 ${getTranslation(language, 'currency')}`,
+      image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&h=300&fit=crop",
+      rating: 4.8,
+      inStock: true,
+      description: language === 'ar' ? "شاشة AMOLED بدقة 2K ومعدل تحديث 120Hz" : "Écran AMOLED 2K avec taux de rafraîchissement 120Hz",
+      features: language === 'ar' ? ["AMOLED 2K", "120Hz", "HDR10+", "Always-On Display"] : ["AMOLED 2K", "120Hz", "HDR10+", "Always-On Display"],
+      warranty: language === 'ar' ? "6 أشهر" : "6 mois",
+      brand: "OnePlus",
+      compatibility: ["OnePlus 11", "OnePlus 10T"]
+    },
+    {
+      id: 6,
+      name: language === 'ar' ? "محرك اهتزاز iPhone 13" : "Moteur de vibration iPhone 13",
+      price: `85 ${getTranslation(language, 'currency')}`,
+      originalPrice: `120 ${getTranslation(language, 'currency')}`,
+      image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400&h=300&fit=crop",
+      rating: 4.5,
+      inStock: false,
+      description: language === 'ar' ? "محرك اهتزاز Taptic Engine أصلي للحصول على تجربة لمسية مثالية" : "Moteur Taptic Engine original pour une expérience tactile parfaite",
+      features: language === 'ar' ? ["Taptic Engine", "ردود فعل دقيقة", "توفير الطاقة", "سهل التركيب"] : ["Taptic Engine", "Retour tactile précis", "Économie d'énergie", "Installation facile"],
+      warranty: language === 'ar' ? "3 أشهر" : "3 mois",
+      brand: "Apple",
+      compatibility: ["iPhone 13", "iPhone 13 Mini"]
+    },
+    {
+      id: 7,
+      name: language === 'ar' ? "كاميرا أمامية Google Pixel 7" : "Caméra frontale Google Pixel 7",
+      price: `220 ${getTranslation(language, 'currency')}`,
+      originalPrice: `280 ${getTranslation(language, 'currency')}`,
+      image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop",
+      rating: 4.7,
+      inStock: true,
+      description: language === 'ar' ? "كاميرا أمامية 10.8MP مع تقنية الذكاء الاصطناعي للصور" : "Caméra frontale 10.8MP avec technologie IA pour photos",
+      features: language === 'ar' ? ["10.8MP", "ذكاء اصطناعي", "تسجيل 4K", "وضع البورتريه"] : ["10.8MP", "Intelligence artificielle", "Enregistrement 4K", "Mode portrait"],
+      warranty: language === 'ar' ? "6 أشهر" : "6 mois",
+      brand: "Google",
+      compatibility: ["Pixel 7", "Pixel 7 Pro"]
+    },
+    {
+      id: 8,
+      name: language === 'ar' ? "شاحن لاسلكي Samsung 25W" : "Chargeur sans fil Samsung 25W",
+      price: `180 ${getTranslation(language, 'currency')}`,
+      originalPrice: `230 ${getTranslation(language, 'currency')}`,
+      image: "https://images.unsplash.com/photo-1588508065123-287b28e013da?w=400&h=300&fit=crop",
+      rating: 4.9,
+      inStock: true,
+      description: language === 'ar' ? "شاحن لاسلكي سريع 25W مع تقنية التبريد المتقدمة" : "Chargeur sans fil rapide 25W avec technologie de refroidissement avancée",
+      features: language === 'ar' ? ["25W سريع", "تبريد متقدم", "LED مؤشر", "حماية زائدة"] : ["25W rapide", "Refroidissement avancé", "LED indicateur", "Protection contre la surchauffe"],
+      warranty: language === 'ar' ? "سنة واحدة" : "1 an",
+      brand: "Samsung",
+      compatibility: ["Galaxy S23", "Galaxy S22", "Galaxy S21", "Note 20"]
     }
   ];
 
@@ -143,6 +243,12 @@ const Parts: React.FC<PartsProps> = ({ language, onLanguageChange }) => {
                     <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                       {getTranslation(language, 'original')}
                     </div>
+                    <button
+                      onClick={() => openProductDetails(part)}
+                      className="absolute top-4 right-4 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-300"
+                    >
+                      <Eye size={16} className="text-gray-700" />
+                    </button>
                   </div>
                   
                   <div className="p-6">
@@ -174,17 +280,26 @@ const Parts: React.FC<PartsProps> = ({ language, onLanguageChange }) => {
                       </div>
                     </div>
                     
-                    <button 
-                      disabled={!part.inStock}
-                      className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 ${
-                        part.inStock
-                          ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white hover:shadow-lg transform hover:scale-105'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
-                    >
-                      <ArrowRight size={18} />
-                      <span>{part.inStock ? getTranslation(language, 'addToCart') : getTranslation(language, 'outOfStock')}</span>
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => openProductDetails(part)}
+                        className="flex-1 py-2 px-3 bg-gray-100 text-gray-700 rounded-lg font-semibold transition-all duration-300 hover:bg-gray-200"
+                      >
+                        <Eye size={16} className="inline mr-1" />
+                        {language === 'ar' ? 'عرض' : 'Voir'}
+                      </button>
+                      <button 
+                        disabled={!part.inStock}
+                        className={`flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-1 ${
+                          part.inStock
+                            ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white hover:shadow-lg transform hover:scale-105'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        <ShoppingCart size={16} />
+                        <span className="text-sm">{part.inStock ? (language === 'ar' ? 'سلة' : 'Panier') : getTranslation(language, 'outOfStock')}</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -311,7 +426,6 @@ const Parts: React.FC<PartsProps> = ({ language, onLanguageChange }) => {
                   </label>
                 </div>
 
-                {/* Uploaded Images Preview */}
                 {uploadedImages.length > 0 && (
                   <div className="mt-6">
                     <h4 className="text-lg font-semibold text-gray-700 mb-4">
@@ -351,8 +465,19 @@ const Parts: React.FC<PartsProps> = ({ language, onLanguageChange }) => {
           </div>
         )}
       </section>
+
+      {/* Product Details Modal */}
+      {selectedProduct && (
+        <ProductDetailsModal
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          language={language}
+        />
+      )}
     </div>
   );
 };
 
 export default Parts;
+

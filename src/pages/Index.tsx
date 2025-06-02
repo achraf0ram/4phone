@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -52,7 +51,7 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
           </h1>
         </div>
 
-        {/* Carousel Section with Auto-play */}
+        {/* Carousel Section with Simple Auto-play */}
         <div className="mb-8 max-w-4xl mx-auto">
           <Carousel 
             className="w-full"
@@ -60,28 +59,6 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
               align: "start",
               loop: true,
             }}
-            plugins={[
-              {
-                name: "autoplay",
-                init: (embla) => {
-                  let intervalId: NodeJS.Timeout;
-                  
-                  const autoplay = () => {
-                    intervalId = setInterval(() => {
-                      embla.scrollNext();
-                    }, 3000);
-                  };
-
-                  embla.on('init', autoplay);
-                  embla.on('pointerDown', () => clearInterval(intervalId));
-                  embla.on('pointerUp', autoplay);
-                  
-                  return {
-                    destroy: () => clearInterval(intervalId)
-                  };
-                }
-              }
-            ]}
           >
             <CarouselContent>
               {carouselImages.map((image, index) => (
