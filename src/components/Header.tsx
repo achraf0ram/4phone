@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Phone, Wrench, ShoppingCart, ArrowRight } from 'lucide-react';
+import { Phone, Wrench, ShoppingCart } from 'lucide-react';
 import LanguageToggle from './LanguageToggle';
 import { getTranslation, Language } from '@/utils/translations';
 
@@ -38,7 +38,6 @@ const Header: React.FC<HeaderProps> = ({ language, onLanguageChange }) => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <ArrowRight size={18} />
                 <span>{getTranslation(language, 'home')}</span>
               </Link>
               
@@ -51,7 +50,6 @@ const Header: React.FC<HeaderProps> = ({ language, onLanguageChange }) => {
                 }`}
               >
                 <Wrench size={18} />
-                <ArrowRight size={16} />
                 <span>{getTranslation(language, 'repairs')}</span>
               </Link>
               
@@ -64,7 +62,6 @@ const Header: React.FC<HeaderProps> = ({ language, onLanguageChange }) => {
                 }`}
               >
                 <ShoppingCart size={18} />
-                <ArrowRight size={16} />
                 <span>{getTranslation(language, 'parts')}</span>
               </Link>
             </nav>

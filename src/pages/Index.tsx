@@ -47,17 +47,42 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 bg-clip-text text-transparent">
-              {getTranslation(language, 'welcomeTitle')}
+              مرحباً بك في 4phone
             </span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            {getTranslation(language, 'welcomeDescription')}
-          </p>
         </div>
 
-        {/* Carousel Section */}
-        <div className="mb-12 max-w-4xl mx-auto">
-          <Carousel className="w-full">
+        {/* Carousel Section with Auto-play */}
+        <div className="mb-8 max-w-4xl mx-auto">
+          <Carousel 
+            className="w-full"
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            plugins={[
+              {
+                name: "autoplay",
+                init: (embla) => {
+                  let intervalId: NodeJS.Timeout;
+                  
+                  const autoplay = () => {
+                    intervalId = setInterval(() => {
+                      embla.scrollNext();
+                    }, 3000);
+                  };
+
+                  embla.on('init', autoplay);
+                  embla.on('pointerDown', () => clearInterval(intervalId));
+                  embla.on('pointerUp', autoplay);
+                  
+                  return {
+                    destroy: () => clearInterval(intervalId)
+                  };
+                }
+              }
+            ]}
+          >
             <CarouselContent>
               {carouselImages.map((image, index) => (
                 <CarouselItem key={index}>
@@ -72,22 +97,21 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious className="hidden" />
+            <CarouselNext className="hidden" />
           </Carousel>
         </div>
 
-        {/* 4phone Description */}
+        {/* Animated 4phone Description */}
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-            4phone
+            📱 4phone 🔧
           </h2>
-          <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            {language === 'ar' 
-              ? 'منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة'
-              : 'Votre plateforme complète pour la réparation de téléphones et la vente et l\'achat de pièces détachées originales et de téléphones d\'occasion aux meilleurs prix et avec la plus haute qualité de service'
-            }
-          </p>
+          <div className="overflow-hidden">
+            <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed animate-pulse">
+              ⚡ منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة 📱💎
+            </p>
+          </div>
         </div>
 
         {/* Action Buttons */}
