@@ -8,11 +8,24 @@ interface ServiceCardProps {
   description: string;
   price?: string;
   gradient: string;
+  onClick?: () => void;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, title, description, price, gradient }) => {
+const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, title, description, price, gradient, onClick }) => {
+  const handleOrderClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onClick) {
+      onClick();
+    } else {
+      console.log('Order clicked for:', title);
+      // Default action - could show a toast or navigate
+      alert(`طلب الخدمة: ${title}`);
+    }
+  };
+
   return (
-    <div className="group relative bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden">
+    <div className="group relative bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden cursor-pointer">
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
       
       <div className="p-6">
@@ -33,7 +46,10 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, title, descriptio
             <span className={`text-2xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>
               {price}
             </span>
-            <button className={`px-4 py-2 bg-gradient-to-r ${gradient} text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300`}>
+            <button 
+              onClick={handleOrderClick}
+              className={`px-4 py-2 bg-gradient-to-r ${gradient} text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
+            >
               اطلب الآن
             </button>
           </div>
