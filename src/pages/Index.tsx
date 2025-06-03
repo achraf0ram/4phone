@@ -1,9 +1,9 @@
-
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
-import { Phone, Wrench, ShoppingCart, Star, Users, Clock, MapPin, Mail, ArrowRight, MessageCircle } from 'lucide-react';
+import ChatBot from '@/components/ChatBot';
+import { Phone, Wrench, ShoppingCart, Star, Users, Clock, MapPin, Mail, ArrowRight } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
 import {
   Carousel,
@@ -57,7 +57,7 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
   };
 
   const handleChatBot = () => {
-    alert('سيتم تفعيل البوت الذكي قريباً! 🤖');
+    console.log('ChatBot button clicked - handled by ChatBot component');
   };
 
   return (
@@ -317,15 +317,8 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
         </div>
       </section>
 
-      {/* Chat Bot Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <button 
-          onClick={handleChatBot}
-          className="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        >
-          <MessageCircle size={24} />
-        </button>
-      </div>
+      {/* Chat Bot */}
+      <ChatBot language={language} />
     </div>
   );
 };

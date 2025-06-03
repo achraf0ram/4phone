@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import ProductDetailsModal from '@/components/ProductDetailsModal';
+import ChatBot from '@/components/ChatBot';
 import { Phone, ShoppingCart, Star, Search, ArrowRight, Upload, X, Eye } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
 
@@ -475,9 +476,11 @@ const Parts: React.FC<PartsProps> = ({ language, onLanguageChange }) => {
           language={language}
         />
       )}
+
+      {/* Chat Bot */}
+      <ChatBot language={language} />
     </div>
   );
 };
 
 export default Parts;
-
