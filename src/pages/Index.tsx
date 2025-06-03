@@ -1,9 +1,8 @@
-
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
-import { Phone, Wrench, ShoppingCart, Star, Users, Clock, MapPin, Mail, ArrowRight } from 'lucide-react';
+import { Phone, Wrench, ShoppingCart, Star, Users, Clock, MapPin, Mail, ArrowRight, MessageCircle } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
 import {
   Carousel,
@@ -21,20 +20,20 @@ interface IndexProps {
 const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
   const carouselImages = [
     {
-      src: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=400&fit=crop",
-      alt: language === 'ar' ? "هواتف مستعملة" : "Téléphones d'occasion"
+      src: "https://images.unsplash.com/photo-1609613838781-ebe38f5d5ac5?w=800&h=400&fit=crop",
+      alt: language === 'ar' ? "شخص يصلح هاتف" : "Personne réparant un téléphone"
     },
     {
-      src: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800&h=400&fit=crop",
-      alt: language === 'ar' ? "قطع غيار أصلية" : "Pièces détachées originales"
+      src: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop",
+      alt: language === 'ar' ? "ذاكرة الهاتف وقطع الغيار" : "Mémoire de téléphone et pièces détachées"
     },
     {
-      src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop",
-      alt: language === 'ar' ? "خدمات الإصلاح" : "Services de réparation"
+      src: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&h=400&fit=crop",
+      alt: language === 'ar' ? "هاتف مكسور" : "Téléphone cassé"
     },
     {
-      src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=400&fit=crop",
-      alt: language === 'ar' ? "فريق محترف" : "Équipe professionnelle"
+      src: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=400&fit=crop",
+      alt: language === 'ar' ? "قطع غيار الهاتف" : "Pièces détachées de téléphone"
     }
   ];
 
@@ -177,37 +176,45 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <ServiceCard
-            icon={Wrench}
-            title={language === 'ar' ? "خدمات الإصلاح" : "Services de réparation"}
-            description={language === 'ar' ? "إصلاح احترافي لجميع أنواع الهواتف الذكية بضمان شامل وقطع غيار أصلية" : "Réparation professionnelle pour tous types de smartphones avec garantie complète et pièces d'origine"}
-            price={`${language === 'ar' ? 'ابتداءً من' : 'À partir de'} 50 ${getTranslation(language, 'currency')}`}
-            gradient="from-blue-500 to-purple-600"
-          />
+          <Link to="/repairs">
+            <ServiceCard
+              icon={Wrench}
+              title={language === 'ar' ? "خدمات الإصلاح" : "Services de réparation"}
+              description={language === 'ar' ? "إصلاح احترافي لجميع أنواع الهواتف الذكية بضمان شامل وقطع غيار أصلية" : "Réparation professionnelle pour tous types de smartphones avec garantie complète et pièces d'origine"}
+              price={`${language === 'ar' ? 'ابتداءً من' : 'À partir de'} 50 ${getTranslation(language, 'currency')}`}
+              gradient="from-blue-500 to-purple-600"
+            />
+          </Link>
           
-          <ServiceCard
-            icon={ShoppingCart}
-            title={language === 'ar' ? "بيع قطع الغيار" : "Vente de pièces détachées"}
-            description={language === 'ar' ? "قطع غيار أصلية ومضمونة لجميع أنواع الهواتف بأفضل الأسعار" : "Pièces détachées originales et garanties pour tous types de téléphones aux meilleurs prix"}
-            price={`${language === 'ar' ? 'ابتداءً من' : 'À partir de'} 20 ${getTranslation(language, 'currency')}`}
-            gradient="from-green-500 to-blue-500"
-          />
+          <Link to="/parts">
+            <ServiceCard
+              icon={ShoppingCart}
+              title={language === 'ar' ? "بيع قطع الغيار" : "Vente de pièces détachées"}
+              description={language === 'ar' ? "قطع غيار أصلية ومضمونة لجميع أنواع الهواتف بأفضل الأسعار" : "Pièces détachées originales et garanties pour tous types de téléphones aux meilleurs prix"}
+              price={`${language === 'ar' ? 'ابتداءً من' : 'À partir de'} 20 ${getTranslation(language, 'currency')}`}
+              gradient="from-green-500 to-blue-500"
+            />
+          </Link>
           
-          <ServiceCard
-            icon={Phone}
-            title={language === 'ar' ? "شراء الهواتف" : "Achat de téléphones"}
-            description={language === 'ar' ? "نشتري هواتفك المستعملة بأفضل الأسعار مع تقييم فوري وعادل" : "Nous achetons vos téléphones d'occasion aux meilleurs prix avec une évaluation immédiate et équitable"}
-            price={`${language === 'ar' ? 'حتى' : 'Jusqu\'à'} 5000 ${getTranslation(language, 'currency')}`}
-            gradient="from-purple-500 to-pink-500"
-          />
+          <Link to="/parts">
+            <ServiceCard
+              icon={Phone}
+              title={language === 'ar' ? "شراء الهواتف" : "Achat de téléphones"}
+              description={language === 'ar' ? "نشتري هواتفك المستعملة بأفضل الأسعار مع تقييم فوري وعادل" : "Nous achetons vos téléphones d'occasion aux meilleurs prix avec une évaluation immédiate et équitable"}
+              price={`${language === 'ar' ? 'حتى' : 'Jusqu\'à'} 5000 ${getTranslation(language, 'currency')}`}
+              gradient="from-purple-500 to-pink-500"
+            />
+          </Link>
 
-          <ServiceCard
-            icon={Phone}
-            title={language === 'ar' ? "الهواتف المستعملة" : "Téléphones d'occasion"}
-            description={language === 'ar' ? "هواتف مستعملة مفحوصة ومضمونة بأفضل الأسعار وجودة عالية" : "Téléphones d'occasion vérifiés et garantis aux meilleurs prix et haute qualité"}
-            price={`${language === 'ar' ? 'ابتداءً من' : 'À partir de'} 800 ${getTranslation(language, 'currency')}`}
-            gradient="from-orange-500 to-red-500"
-          />
+          <Link to="/parts">
+            <ServiceCard
+              icon={Phone}
+              title={language === 'ar' ? "الهواتف المستعملة" : "Téléphones d'occasion"}
+              description={language === 'ar' ? "هواتف مستعملة مفحوصة ومضمونة بأفضل الأسعار وجودة عالية" : "Téléphones d'occasion vérifiés et garantis aux meilleurs prix et haute qualité"}
+              price={`${language === 'ar' ? 'ابتداءً من' : 'À partir de'} 800 ${getTranslation(language, 'currency')}`}
+              gradient="from-orange-500 to-red-500"
+            />
+          </Link>
         </div>
       </section>
 
@@ -269,6 +276,24 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
           </div>
         </div>
       </section>
+
+      {/* Moving News Ticker */}
+      <section className="bg-blue-600 py-4 overflow-hidden">
+        <div className="whitespace-nowrap animate-pulse">
+          <div className="inline-block text-white text-lg font-semibold animate-marquee">
+            ⭐ أحدث العروض والخدمات في 4phone • إصلاح سريع وضمان 6 أشهر • قطع غيار أصلية مضمونة • هواتف مستعملة بأفضل الأسعار • خدمة العملاء 24/7 • 
+            فريق محترف ومعتمد • ⭐ أحدث العروض والخدمات في 4phone • إصلاح سريع وضمان 6 أشهر • قطع غيار أصلية مضمونة • هواتف مستعملة بأفضل الأسعار • خدمة العملاء 24/7 • 
+            فريق محترف ومعتمد • ⭐
+          </div>
+        </div>
+      </section>
+
+      {/* Chat Bot Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button className="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300">
+          <MessageCircle size={24} />
+        </button>
+      </div>
     </div>
   );
 };
