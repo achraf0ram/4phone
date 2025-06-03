@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
@@ -51,7 +52,7 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
           </h1>
         </div>
 
-        {/* Carousel Section with Simple Auto-play */}
+        {/* Carousel Section */}
         <div className="mb-8 max-w-4xl mx-auto">
           <Carousel 
             className="w-full"
@@ -74,8 +75,8 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden" />
-            <CarouselNext className="hidden" />
+            <CarouselPrevious className="left-4" />
+            <CarouselNext className="right-4" />
           </Carousel>
         </div>
 
@@ -85,7 +86,7 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
             📱 4phone 🔧
           </h2>
           <div className="overflow-hidden">
-            <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed animate-pulse">
+            <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed animate-bounce">
               ⚡ منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة 📱💎
             </p>
           </div>
