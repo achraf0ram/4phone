@@ -95,24 +95,24 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
 
   return (
     <>
-      {/* Chat Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      {/* Chat Button - Mobile Responsive */}
+      <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
         <button 
           onClick={() => setIsOpen(true)}
-          className="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          className="bg-gradient-to-r from-blue-500 to-green-500 text-white p-3 md:p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
         >
-          <MessageCircle size={24} />
+          <MessageCircle size={20} className="md:w-6 md:h-6" />
         </button>
       </div>
 
-      {/* Chat Window */}
+      {/* Chat Window - Mobile Responsive */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-80 h-96 bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col">
+        <div className="fixed inset-4 md:bottom-6 md:right-6 md:inset-auto md:w-80 md:h-96 bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 rounded-t-xl flex items-center justify-between">
             <div className="flex items-center space-x-2 space-x-reverse">
               <Bot size={20} />
-              <span className="font-semibold">
+              <span className="font-semibold text-sm md:text-base">
                 {language === 'ar' ? 'مساعد 4phone' : 'Assistant 4phone'}
               </span>
             </div>
@@ -125,28 +125,28 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3">
+          <div className="flex-1 p-3 md:p-4 overflow-y-auto space-y-3">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
               >
-                <div className={`flex items-start space-x-2 space-x-reverse max-w-[70%] ${message.isBot ? 'flex-row' : 'flex-row-reverse'}`}>
-                  <div className={`p-2 rounded-full ${message.isBot ? 'bg-blue-100' : 'bg-green-100'}`}>
+                <div className={`flex items-start space-x-2 space-x-reverse max-w-[85%] md:max-w-[70%] ${message.isBot ? 'flex-row' : 'flex-row-reverse'}`}>
+                  <div className={`p-1.5 md:p-2 rounded-full ${message.isBot ? 'bg-blue-100' : 'bg-green-100'}`}>
                     {message.isBot ? (
-                      <Bot size={16} className="text-blue-600" />
+                      <Bot size={12} className="md:w-4 md:h-4 text-blue-600" />
                     ) : (
-                      <User size={16} className="text-green-600" />
+                      <User size={12} className="md:w-4 md:h-4 text-green-600" />
                     )}
                   </div>
                   <div
-                    className={`p-3 rounded-lg ${
+                    className={`p-2 md:p-3 rounded-lg ${
                       message.isBot
                         ? 'bg-gray-100 text-gray-800'
                         : 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
                     }`}
                   >
-                    <p className="text-sm">{message.text}</p>
+                    <p className="text-xs md:text-sm leading-relaxed">{message.text}</p>
                   </div>
                 </div>
               </div>
@@ -155,14 +155,14 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
             {isTyping && (
               <div className="flex justify-start">
                 <div className="flex items-start space-x-2 space-x-reverse">
-                  <div className="p-2 rounded-full bg-blue-100">
-                    <Bot size={16} className="text-blue-600" />
+                  <div className="p-1.5 md:p-2 rounded-full bg-blue-100">
+                    <Bot size={12} className="md:w-4 md:h-4 text-blue-600" />
                   </div>
-                  <div className="bg-gray-100 p-3 rounded-lg">
+                  <div className="bg-gray-100 p-2 md:p-3 rounded-lg">
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
                   </div>
                 </div>
@@ -171,7 +171,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-3 md:p-4 border-t border-gray-200">
             <div className="flex space-x-2 space-x-reverse">
               <input
                 type="text"
@@ -179,14 +179,14 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 placeholder={language === 'ar' ? 'اكتب رسالتك...' : 'Tapez votre message...'}
-                className="flex-1 p-2 border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300"
+                className="flex-1 p-2 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300"
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!inputText.trim()}
                 className="p-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Send size={16} />
+                <Send size={14} className="md:w-4 md:h-4" />
               </button>
             </div>
           </div>
