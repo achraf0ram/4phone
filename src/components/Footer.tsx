@@ -181,8 +181,8 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
             <div className="text-center text-gray-400">
               <p>
                 {language === 'ar' 
-                  ? '© 2024 4phone. جميع الحقوق محفوظة. منصتك الموثوقة لإصلاح الهواتف' 
-                  : '© 2024 4phone. Tous droits réservés. Votre plateforme de confiance pour la réparation de téléphones'
+                  ? '© 2025 4phone. جميع الحقوق محفوظة. منصتك الموثوقة لإصلاح الهواتف' 
+                  : '© 2025 4phone. Tous droits réservés. Votre plateforme de confiance pour la réparation de téléphones'
                 }
               </p>
             </div>
