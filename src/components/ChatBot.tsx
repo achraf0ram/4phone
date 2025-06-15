@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
@@ -55,7 +54,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
     }, Math.random() * 1000 + 1000); // Random delay between 1-2 seconds
   };
 
-  const getBotResponse = (userInput: string, lang: Language): string => {
+  function getBotResponse(userInput: string, lang: Language): string {
     const input = userInput.toLowerCase();
     
     // Greetings and basic interactions
@@ -205,7 +204,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.isBot ? 'justify-start' : 'justify-end'} animate-fadeIn`}
+                className={`flex ${message.isBot ? 'justify-start' : 'justify-end'} animate-fade-in`}
               >
                 <div className={`flex items-start space-x-2 space-x-reverse max-w-[85%] md:max-w-[75%] ${message.isBot ? 'flex-row' : 'flex-row-reverse'}`}>
                   <div className={`p-1.5 md:p-2 rounded-full ${message.isBot ? 'bg-blue-100' : 'bg-green-100'} shadow-sm`}>
@@ -232,7 +231,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
             ))}
             
             {isTyping && (
-              <div className="flex justify-start animate-fadeIn">
+              <div className="flex justify-start animate-fade-in">
                 <div className="flex items-start space-x-2 space-x-reverse">
                   <div className="p-1.5 md:p-2 rounded-full bg-blue-100 shadow-sm">
                     <Bot size={12} className="md:w-4 md:h-4 text-blue-600" />
