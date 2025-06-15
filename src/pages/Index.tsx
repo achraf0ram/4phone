@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+
+import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
 import ChatBot from '@/components/ChatBot';
 import Footer from '@/components/Footer';
-import { Phone, Wrench, ShoppingCart, Star, Users, Clock, MapPin, Mail, ArrowRight } from 'lucide-react';
+import { Phone, Wrench, ShoppingCart, ArrowRight } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
 import {
   Carousel,
@@ -13,7 +14,31 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import useEmblaCarousel from 'embla-carousel-react';
 
+// صور السلايدر الجديدة
+const carouselImages = [
+  {
+    src: "/lovable-uploads/e4725cdf-77c6-4294-bce9-5561debea0a2.png",
+    altAr: "شخص يصلح هاتف",
+    altFr: "Personne réparant un téléphone"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop",
+    altAr: "ذاكرة الهاتف وقطع الغيار",
+    altFr: "Mémoire de téléphone et pièces détachées"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&h=400&fit=crop",
+    altAr: "هاتف مكسور",
+    altFr: "Téléphone cassé"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=400&fit=crop",
+    altAr: "قطع غيار الهاتف",
+    altFr: "Pièces détachées"
+  }
+];
 interface IndexProps {
   language: Language;
   onLanguageChange: (lang: string) => void;
@@ -39,59 +64,36 @@ const newsItemsFr = [
 
 const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
   const navigate = useNavigate();
-
-  const carouselImages = [
-    {
-      src: "https://images.unsplash.com/photo-1609613838781-ebe38f5d5ac5?w=800&h=400&fit=crop",
-      alt: language === 'ar' ? "شخص يصلح هاتف" : "Personne réparant un téléphone"
-    },
-    {
-      src: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop",
-      alt: language === 'ar' ? "ذاكرة الهاتف وقطع الغيار" : "Mémoire de téléphone et pièces détachées"
-    },
-    {
-      src: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&h=400&fit=crop",
-      alt: language === 'ar' ? "هاتف مكسور" : "Téléphone cassé"
-    },
-    {
-      src: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=400&fit=crop",
-      alt: language === 'ar' ? "قطع غيار الهاتف" : "Pièces غيار الهاتف"
-    }
-  ];
-
-  const handleRepairService = () => {
-    navigate('/repairs');
-  };
-
-  const handlePartsService = () => {
-    navigate('/parts');
-  };
-
-  const handlePhonePurchase = () => {
-    navigate('/parts');
-  };
-
-  const handleUsedPhones = () => {
-    navigate('/parts');
-  };
-
-  const handleChatBot = () => {
-    console.log('ChatBot button clicked - handled by ChatBot component');
-  };
+  // carousel embla for autoplay
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const autoplayInterval = useRef<NodeJS.Timeout | null>(null);
 
   // اختيار الأخبار حسب اللغة
   const newsItems = language === 'ar' ? newsItemsAr : newsItemsFr;
-  // دمج كل العناصر مع فواصل مناسبة
   const newsText = newsItems.join(' • ');
 
-  // الشريط الإخباري: عكس اتجاه الحركة والكلاس
+  // شريط الأخبار: عكس اتجاه الحركة والكلاس
   const tickerClass =
     language === 'ar'
       ? 'news-ticker-content-ar'
       : 'news-ticker-content-fr';
 
-  // اجعل اتجاه الكتابة عادي للغة (لا حاجة لعكس)
   const direction = language === 'ar' ? 'rtl' : 'ltr';
+
+  // تفعيل تغيير الصور تلقائياً
+  useEffect(() => {
+    if (!emblaApi) return;
+    autoplayInterval.current && clearInterval(autoplayInterval.current as NodeJS.Timeout);
+    autoplayInterval.current = setInterval(() => {
+      if (emblaApi) emblaApi.scrollNext();
+    }, 3500);
+    return () => {
+      if (autoplayInterval.current) clearInterval(autoplayInterval.current);
+    };
+  }, [emblaApi]);
+
+  // عنواين كل صورة حسب اللغة
+  const getAlt = (img: any) => language === 'ar' ? img.altAr : img.altFr;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -99,43 +101,58 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
       
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 bg-clip-text text-transparent">
-              مرحباً بك في 4phone
+        <div className="text-center mb-10">
+          {/* عنوان ملون ديناميكي كما في الصورة */}
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 flex flex-col items-center justify-center gap-4">
+            <span className="text-5xl md:text-6xl font-bold text-blue-700">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 bg-clip-text text-transparent">
+                مرحباً بك في{' '}
+                <span className="font-extrabold" style={{
+                  background: 'linear-gradient(90deg,#2563eb 10%,#7c3aed 60%,#10b981 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>phone</span>
+              </span>
             </span>
           </h1>
         </div>
 
         {/* Carousel Section */}
         <div className="mb-8 max-w-4xl mx-auto">
-          <Carousel 
-            className="w-full"
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-          >
-            <CarouselContent>
-              {carouselImages.map((image, index) => (
-                <CarouselItem key={index}>
-                  <div className="relative">
-                    <img
-                      src={image.src}
-                      alt={image.alt}
-                      className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-20 rounded-xl"></div>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="left-4" />
-            <CarouselNext className="right-4" />
-          </Carousel>
+          <div ref={emblaRef}>
+            <Carousel className="w-full"
+              opts={{
+                align: "start",
+                loop: true
+              }}
+            >
+              <CarouselContent>
+                {carouselImages.map((image, index) => (
+                  <CarouselItem key={index}>
+                    <div className="relative">
+                      {/* وضع العنوان (alt) في زاوية الصورة أعلى يمين أو يسار حسب اللغة */}
+                      <div className={`absolute top-2 ${language === 'ar' ? 'right-3' : 'left-3'} z-10 bg-white/80 px-3 py-1 rounded-lg text-sm font-medium shadow text-gray-900`}>
+                        {getAlt(image)}
+                      </div>
+                      <img
+                        src={image.src}
+                        alt={getAlt(image)}
+                        className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg bg-gray-300"
+                        style={{backgroundColor:'#bbb'}}
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-20 rounded-xl pointer-events-none"></div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-4" />
+              <CarouselNext className="right-4" />
+            </Carousel>
+          </div>
         </div>
 
-        {/* Moving News Ticker - عكس الاتجاه */}
+        {/* Moving News Ticker */}
         <section
           className="news-ticker py-4 mb-12 rounded-xl"
           dir={direction}
@@ -179,47 +196,47 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div onClick={handleRepairService}>
+          <div onClick={() => navigate('/repairs')}>
             <ServiceCard
               icon={Wrench}
               title={language === 'ar' ? "خدمات الإصلاح" : "Services de réparation"}
               description={language === 'ar' ? "إصلاح احترافي لجميع أنواع الهواتف الذكية بضمان شامل وقطع غيار أصلية" : "Réparation professionnelle pour tous types de smartphones avec garantie complète et pièces d'origine"}
               price={`${language === 'ar' ? 'ابتداءً من' : 'À partir de'} 50 ${getTranslation(language, 'currency')}`}
               gradient="from-blue-500 to-purple-600"
-              onClick={handleRepairService}
+              onClick={() => navigate('/repairs')}
             />
           </div>
           
-          <div onClick={handlePartsService}>
+          <div onClick={() => navigate('/parts')}>
             <ServiceCard
               icon={ShoppingCart}
               title={language === 'ar' ? "بيع قطع الغيار" : "Vente de pièces détachées"}
               description={language === 'ar' ? "قطع غيار أصلية ومضمونة لجميع أنواع الهواتف بأفضل الأسعار" : "Pièces détachées originales et garanties pour tous types de téléphones aux meilleurs prix"}
               price={`${language === 'ar' ? 'ابتداءً من' : 'À partir de'} 20 ${getTranslation(language, 'currency')}`}
               gradient="from-green-500 to-blue-500"
-              onClick={handlePartsService}
+              onClick={() => navigate('/parts')}
             />
           </div>
           
-          <div onClick={handlePhonePurchase}>
+          <div onClick={() => navigate('/parts')}>
             <ServiceCard
               icon={Phone}
               title={language === 'ar' ? "شراء الهواتف" : "Achat de téléphones"}
               description={language === 'ar' ? "نشتري هواتفك المستعملة بأفضل الأسعار مع تقييم فوري وعادل" : "Nous achetons vos téléphones d'occasion aux meilleurs prix avec une évaluation immédiate et équitable"}
               price={`${language === 'ar' ? 'حتى' : 'Jusqu\'à'} 5000 ${getTranslation(language, 'currency')}`}
               gradient="from-purple-500 to-pink-500"
-              onClick={handlePhonePurchase}
+              onClick={() => navigate('/parts')}
             />
           </div>
 
-          <div onClick={handleUsedPhones}>
+          <div onClick={() => navigate('/parts')}>
             <ServiceCard
               icon={Phone}
               title={language === 'ar' ? "الهواتف المستعملة" : "Téléphones d'occasion"}
               description={language === 'ar' ? "هواتف مستعملة مفحوصة ومضمونة بأفضل الأسعار وجودة عالية" : "Téléphones d'occasion vérifiés et garantis aux meilleurs prix et haute qualité"}
               price={`${language === 'ar' ? 'ابتداءً من' : 'À partir de'} 800 ${getTranslation(language, 'currency')}`}
               gradient="from-orange-500 to-red-500"
-              onClick={handleUsedPhones}
+              onClick={() => navigate('/parts')}
             />
           </div>
         </div>
@@ -235,3 +252,4 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
 };
 
 export default Index;
+
