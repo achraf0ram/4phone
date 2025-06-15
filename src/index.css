@@ -43,24 +43,24 @@
     background: linear-gradient(90deg, #2563eb, #7c3aed, #2563eb);
   }
   
-  /* Arabic ticker: slow and moves right-to-left */
+  /* عكس الاتجاه: بالعربية يبدأ من اليسار ويتحرك لليمين */
   .news-ticker-content-ar {
     display: inline-block;
-    animation: scroll-right-to-left-slow 40s linear infinite;
-    padding-left: 100%;
+    animation: scroll-left-to-right-slow 40s linear infinite;
+    padding-right: 100%; /* from left */
     font-size: 0.9rem;
     direction: rtl;
-    text-align: right;
+    text-align: left; /* يبدأ من اليسار */
   }
   
-  /* French ticker: slow and moves left-to-right */
+  /* بالفرنسية يبدأ من اليمين ويتحرك لليسار */
   .news-ticker-content-fr {
     display: inline-block;
-    animation: scroll-left-to-right-slow 40s linear infinite;
-    padding-right: 100%;
+    animation: scroll-right-to-left-slow 40s linear infinite;
+    padding-left: 100%; /* from right */
     font-size: 0.9rem;
     direction: ltr;
-    text-align: left;
+    text-align: right; /* يبدأ من اليمين */
   }
   
   @media (max-width: 768px) {
