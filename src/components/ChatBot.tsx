@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { MessageCircle, X, Send, Bot, User, Image as ImageIcon, MessageSquare } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
@@ -6,14 +7,6 @@ interface ChatBotProps {
   language: Language;
 }
 
-interface Message {
-  id: number;
-  text: string;
-  isBot: boolean;
-  timestamp: Date;
-}
-
-// نوع الرسالة يدعم الصور الآن
 interface Message {
   id: number;
   text: string;
@@ -43,7 +36,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // حفظ Prisma API KEY محلياً
+  // حفظ Perplexity API KEY محلياً
   const handleSaveApiKey = () => {
     if (apiKey.trim().length > 10) {
       localStorage.setItem('perplexityApiKey', apiKey.trim());
@@ -54,13 +47,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
   // اختيار صورة
   const handleSelectImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setSelectedImage(event.target.files[0]);
-      setPreviewUrl(URL.createObjectURL(event.target.files[0]));
+      const file = event.target.files[0];
+      setSelectedImage(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
   // إزالة الصورة
   const handleRemoveImage = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setSelectedImage(null);
     setPreviewUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -79,7 +76,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
 
     const userMessage: Message = {
       id: messages.length + 1,
-      text: inputText,
+      text: inputText || (selectedImage ? (language === 'ar' ? 'صورة مرفقة' : 'Image attachée') : ''),
       isBot: false,
       timestamp: new Date(),
       imageUrl: previewUrl || undefined,
@@ -106,40 +103,33 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
         ]);
         setIsTyping(false);
       }, 700);
+      handleRemoveImage();
       return;
     }
 
-    // ذكاء اصطناعي (Perplexity) للرد على الرسائل/المشاكل مع إرسال صورة (إن وجدت)
+    // ذكاء اصطناعي (Perplexity) للرد على الرسائل/المشاكل
     try {
-      let imgBase64 = '';
-      if (selectedImage) {
-        // تحويل الصورة Base64 لرفعها على Perplexity (أغلب النماذج تقبل نصي فقط - نرسل وصف للصورة)
-        const reader = new FileReader();
-        imgBase64 = await new Promise<string>((resolve, reject) => {
-          reader.onload = e => resolve((e.target?.result as string) || '');
-          reader.onerror = reject;
-          reader.readAsDataURL(selectedImage);
-        });
-      }
-
       // رسالة نظام (prompt)
       let prompt = '';
       if (language === "ar") {
-        prompt = "أنت مساعد محترف في إصلاح الهواتف والرد على مشاكلها، اجب باختصار ودقة وبأسلوب ودود، وإذا أرسل المستخدم صورة حاول تشخيص العطل حسب الوضوح.";
+        prompt = "أنت مساعد محترف في إصلاح الهواتف والرد على مشاكلها، اجب باختصار ودقة وبأسلوب ودود. إذا أرسل المستخدم صورة، حاول تقديم نصائح عامة حول مشاكل الهواتف الشائعة.";
       } else {
-        prompt = "Vous êtes un assistant professionnel dans la réparation de téléphones. Répondez brièvement, précisément et avec amabilité. Si une image est envoyée, essayez de diagnostiquer la panne si possible.";
+        prompt = "Vous êtes un assistant professionnel dans la réparation de téléphones. Répondez brièvement, précisément et avec amabilité. Si une image est envoyée, essayez de donner des conseils généraux sur les problèmes courants des téléphones.";
       }
 
-      // تحضير الرسائل مع الصورة كوصف
+      // تحضير الرسائل
       const messagesForApi: any[] = [
         { role: "system", content: prompt }
       ];
-      if (selectedImage && imgBase64) {
-        messagesForApi.push({ role: "user", content: (language === "ar" ? "انظر لهذه الصورة:" : "Regardez cette image:") + " [image attached]" });
+      
+      let messageContent = inputText;
+      if (selectedImage && !inputText.trim()) {
+        messageContent = language === "ar" ? "أرفقت صورة لمشكلة في هاتفي، هل يمكنك مساعدتي؟" : "J'ai attaché une image d'un problème avec mon téléphone, pouvez-vous m'aider?";
+      } else if (selectedImage && inputText.trim()) {
+        messageContent = inputText + (language === "ar" ? " (مع صورة مرفقة)" : " (avec image attachée)");
       }
-      if (inputText.trim()) {
-        messagesForApi.push({ role: "user", content: inputText });
-      }
+      
+      messagesForApi.push({ role: "user", content: messageContent });
 
       // طلب إلى Perplexity
       const apiMsg = {
@@ -161,6 +151,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
         body: JSON.stringify(apiMsg)
       });
 
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       const data = await res.json();
       let botText = (data.choices && data.choices[0]?.message?.content) || (
         language === 'ar'
@@ -178,22 +172,21 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
         }
       ]);
     } catch (err) {
+      console.error('Error calling Perplexity API:', err);
       setMessages(prev => [
         ...prev,
         {
           id: prev.length + 2,
           text: language === 'ar'
-            ? 'حدث خطأ أثناء محاولة الرد الآلي. تأكد من صحة مفتاح Perplexity API.'
-            : "Erreur lors de la génération de la réponse AI. Veuillez vérifier votre clé API.",
+            ? 'حدث خطأ أثناء محاولة الرد الآلي. تأكد من صحة مفتاح Perplexity API أو تواصل معنا مباشرة عبر واتساب.'
+            : "Erreur lors de la génération de la réponse AI. Veuillez vérifier votre clé API ou nous contacter directement via WhatsApp.",
           isBot: true,
           timestamp: new Date()
         }
       ]);
     } finally {
       setIsTyping(false);
-      setSelectedImage(null);
-      setPreviewUrl(null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      handleRemoveImage();
     }
   };
 
@@ -214,14 +207,23 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
         <div className="fixed inset-4 md:bottom-6 md:right-6 md:inset-auto md:w-96 md:h-fit bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
           <div className="p-6">
             <div className="font-bold text-lg mb-3">🔑 {language === "ar" ? "أدخل مفتاح Perplexity API" : "Renseignez la clé API Perplexity"}</div>
-            <input type="password" placeholder="API Key..." value={apiKey} onChange={e => setApiKey(e.target.value)}
-              className="border p-3 rounded w-full mb-4"/>
+            <input 
+              type="password" 
+              placeholder="API Key..." 
+              value={apiKey} 
+              onChange={e => setApiKey(e.target.value)}
+              className="border p-3 rounded w-full mb-4"
+            />
             <button
-              className="bg-blue-600 text-white w-full rounded py-2 hover:bg-blue-700 mb-2"
+              className="bg-blue-600 text-white w-full rounded py-2 hover:bg-blue-700 mb-2 disabled:opacity-50"
               onClick={handleSaveApiKey}
               disabled={apiKey.length < 12}
-            >{language === "ar" ? "حفظ ومتابعة" : "Enregistrer & Continuer"}</button>
-            <div className="text-xs text-gray-500">{language === "ar" ? "ستُخزن محلياً ولن ترسل خارج جهازك" : "La clé API sera sauvegardée localement."}</div>
+            >
+              {language === "ar" ? "حفظ ومتابعة" : "Enregistrer & Continuer"}
+            </button>
+            <div className="text-xs text-gray-500">
+              {language === "ar" ? "ستُخزن محلياً ولن ترسل خارج جهازك" : "La clé API sera sauvegardée localement."}
+            </div>
           </div>
         </div>
       )}
@@ -286,7 +288,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center px-3 py-1 mt-2 text-white bg-green-600 hover:bg-green-700 rounded shadow transition space-x-1"
                       >
-                        <MessageSquare size={16} /> <span>{language === "ar" ? "تواصل عبر واتساب" : "Contacter via WhatsApp"}</span>
+                        <MessageSquare size={16} /> 
+                        <span>{language === "ar" ? "تواصل عبر واتساب" : "Contacter via WhatsApp"}</span>
                       </a>
                     )}
                     <div className={`text-xs mt-1 ${message.isBot ? 'text-gray-500' : 'text-blue-100'}`}>
@@ -322,7 +325,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
                 placeholder={language === 'ar' ? 'اكتب رسالتك هنا...' : 'Tapez votre message ici...'}
                 className="flex-1 p-3 text-sm border border-gray-200 rounded-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white shadow-sm"
                 disabled={isTyping}
@@ -355,14 +358,16 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
             {previewUrl && (
               <div className="flex mt-2 items-center space-x-2 space-x-reverse">
                 <img src={previewUrl} alt="preview" className="h-16 w-16 rounded border object-contain" />
-                <button onClick={handleRemoveImage} className="text-xs text-red-600 hover:underline">{language === 'ar' ? "حذف الصورة" : "Supprimer l'image"}</button>
+                <button onClick={handleRemoveImage} className="text-xs text-red-600 hover:underline">
+                  {language === 'ar' ? "حذف الصورة" : "Supprimer l'image"}
+                </button>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* تحريك Fade-in (بديل style jsx) */}
+      {/* تحريك Fade-in */}
       <style>
         {`
           .animate-fade-in {
