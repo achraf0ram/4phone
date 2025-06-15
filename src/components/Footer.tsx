@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Phone, Mail, MapPin, Clock, Star, Users, Shield, Award, Facebook, Twitter, Instagram } from 'lucide-react';
 import { Language } from '@/utils/translations';
@@ -80,22 +79,57 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
             <h3 className="text-xl font-bold mb-6 text-purple-400">
               {language === 'ar' ? 'سياسة المنصة' : 'Politique de la plateforme'}
             </h3>
-            <div className="space-y-3">
-              <a href="#" className="block hover:text-purple-400 transition-colors">
-                {language === 'ar' ? 'شروط الاستخدام' : 'Conditions d\'utilisation'}
-              </a>
-              <a href="#" className="block hover:text-purple-400 transition-colors">
-                {language === 'ar' ? 'سياسة الخصوصية' : 'Politique de confidentialité'}
-              </a>
-              <a href="#" className="block hover:text-purple-400 transition-colors">
-                {language === 'ar' ? 'سياسة الإرجاع' : 'Politique de retour'}
-              </a>
-              <a href="#" className="block hover:text-purple-400 transition-colors">
-                {language === 'ar' ? 'طرق الدفع' : 'Méthodes de paiement'}
-              </a>
-              <a href="#" className="block hover:text-purple-400 transition-colors">
-                {language === 'ar' ? 'الضمانات' : 'Garanties'}
-              </a>
+            <div className="space-y-4">
+              <div>
+                <span className="block font-semibold text-purple-300 mb-1">
+                  {language === 'ar' ? 'شروط الاستخدام' : 'Conditions d\'utilisation'}
+                </span>
+                <p className="text-gray-400 text-sm">
+                  {language === 'ar'
+                    ? 'يجب احترام المعايير المحلية وعدم استخدام الموقع لأي نشاط غير قانوني.'
+                    : 'Vous devez respecter les lois locales et ne pas utiliser la plateforme à des fins illicites.'}
+                </p>
+              </div>
+              <div>
+                <span className="block font-semibold text-purple-300 mb-1">
+                  {language === 'ar' ? 'سياسة الخصوصية' : 'Politique de confidentialité'}
+                </span>
+                <p className="text-gray-400 text-sm">
+                  {language === 'ar'
+                    ? 'نحترم خصوصية بياناتك ونضمن عدم مشاركتها مع أي طرف ثالث دون إذنك.'
+                    : 'Nous respectons la confidentialité de vos données et ne les partageons jamais sans consentement.'}
+                </p>
+              </div>
+              <div>
+                <span className="block font-semibold text-purple-300 mb-1">
+                  {language === 'ar' ? 'سياسة الإرجاع' : 'Politique de retour'}
+                </span>
+                <p className="text-gray-400 text-sm">
+                  {language === 'ar'
+                    ? 'يمكنك طلب إرجاع أو استبدال المنتج خلال 7 أيام إذا لم يكن مطابقًا للوصف.'
+                    : 'Vous pouvez demander un retour ou un échange dans les 7 jours si le produit ne correspond pas à la description.'}
+                </p>
+              </div>
+              <div>
+                <span className="block font-semibold text-purple-300 mb-1">
+                  {language === 'ar' ? 'طرق الدفع' : 'Méthodes de paiement'}
+                </span>
+                <p className="text-gray-400 text-sm">
+                  {language === 'ar'
+                    ? 'نقبل الدفع نقدًا عند الاستلام أو عبر التحويل البنكي.'
+                    : 'Paiement à la livraison ou par virement bancaire accepté.'}
+                </p>
+              </div>
+              <div>
+                <span className="block font-semibold text-purple-300 mb-1">
+                  {language === 'ar' ? 'الضمانات' : 'Garanties'}
+                </span>
+                <p className="text-gray-400 text-sm">
+                  {language === 'ar'
+                    ? 'جميع الإصلاحات وقطع الغيار تشمل ضمانًا لمدة 6 أشهر.'
+                    : 'Toutes les réparations et pièces bénéficient d\'une garantie de 6 mois.'}
+                </p>
+              </div>
             </div>
           </div>
 
