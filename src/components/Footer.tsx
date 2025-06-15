@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Mail, MapPin, Clock, Star, Users, Shield, Award, Facebook, Twitter, Instagram } from 'lucide-react';
+import { Phone, Mail, Clock, Star, Users, Shield, Award, Location } from 'lucide-react';
 import { Language } from '@/utils/translations';
 
 interface FooterProps {
@@ -9,9 +9,9 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ language }) => {
   return (
     <footer className="bg-gray-900 text-white">
-      {/* Main Footer Content */}
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
           {/* Contact Information */}
           <div>
             <h3 className="text-xl font-bold mb-6 text-blue-400">
@@ -23,13 +23,19 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
                 <span>+212 6 12 34 56 78</span>
               </div>
               <div className="flex items-center space-x-3 space-x-reverse">
+                <Phone className="text-blue-400" size={20} />
+                <span>+212620740008</span>
+              </div>
+              <div className="flex items-center space-x-3 space-x-reverse">
                 <Mail className="text-blue-400" size={20} />
                 <span>info@4phone.ma</span>
               </div>
               <div className="flex items-center space-x-3 space-x-reverse">
-                <MapPin className="text-blue-400" size={20} />
+                <Location className="text-blue-400" size={20} />
                 <span>
-                  {language === 'ar' ? 'شارع الحسن الثاني، الرباط، المغرب' : 'Avenue Hassan II, Rabat, Maroc'}
+                  {language === 'ar'
+                    ? 'الدروة، قسارية المدينة، المغرب'
+                    : 'Daroua, Qissaria Al Madina, Maroc'}
                 </span>
               </div>
               <div className="flex items-center space-x-3 space-x-reverse">
@@ -118,16 +124,6 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
                   {language === 'ar'
                     ? 'نقبل الدفع نقدًا عند الاستلام أو عبر التحويل البنكي.'
                     : 'Paiement à la livraison ou par virement bancaire accepté.'}
-                </p>
-              </div>
-              <div>
-                <span className="block font-semibold text-purple-300 mb-1">
-                  {language === 'ar' ? 'الضمانات' : 'Garanties'}
-                </span>
-                <p className="text-gray-400 text-sm">
-                  {language === 'ar'
-                    ? 'جميع الإصلاحات وقطع الغيار تشمل ضمانًا لمدة 6 أشهر.'
-                    : 'Toutes les réparations et pièces bénéficient d\'une garantie de 6 mois.'}
                 </p>
               </div>
             </div>
