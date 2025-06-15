@@ -19,23 +19,19 @@ import useEmblaCarousel from 'embla-carousel-react';
 const carouselImages = [
   {
     src: "/lovable-uploads/e4725cdf-77c6-4294-bce9-5561debea0a2.png",
-    altAr: "شخص يصلح هاتف",
-    altFr: "Personne réparant un téléphone"
+   
   },
   {
     src: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop",
-    altAr: "ذاكرة الهاتف وقطع الغيار",
-    altFr: "Mémoire de téléphone et pièces détachées"
+  
   },
   {
     src: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&h=400&fit=crop",
-    altAr: "هاتف مكسور",
-    altFr: "Téléphone cassé"
+
   },
   {
     src: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=400&fit=crop",
-    altAr: "قطع غيار الهاتف",
-    altFr: "Pièces détachées"
+ 
   }
 ];
 interface IndexProps {
@@ -45,7 +41,7 @@ interface IndexProps {
 
 const newsItemsAr = [
   "⚡ منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة 📱💎",
-  "🔥 '4phone'عروض حصرية في ",
+  "🔥 4phone عروض حصرية في ",
   "✅ إصلاح فوري مع ضمان 6 أشهر",
   "🛠️ قطع غيار أصلية 100%",
   "🎉 هواتف مستعملة مضمونة",
@@ -91,9 +87,6 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
     };
   }, [emblaApi]);
 
-  // عنواين كل صورة حسب اللغة
-  const getAlt = (img: any) => language === 'ar' ? img.altAr : img.altFr;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <Header language={language} onLanguageChange={onLanguageChange} />
@@ -102,10 +95,10 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
       <section className="container mx-auto px-4 py-20">
 
         <div className="text-center mb-10">
-          {/* عنوان جذاب مع إبراز اسم المنصة 4phone بتدرج لوني */}
+   
           <h1 className="text-3xl md:text-5xl font-extrabold mb-6 flex flex-col items-center justify-center gap-4">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-green-500">
-              اكتشف منصتك الأولى لإصلاح وبيع الهواتف&nbsp;
+             4phone اكتشف منصتك الأولى لإصلاح وبيع الهواتف;
               <span
                 className="font-black"
                 style={{
@@ -171,9 +164,7 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
 
         {/* Animated 4phone Description */}
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-            📱 4phone 🔧
-          </h2>
+
           <div className="overflow-hidden">
             {/* تم حذف الوصف المتحرك هنا بناءً على طلبك */}
           </div>
