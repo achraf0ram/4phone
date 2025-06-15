@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Phone, Mail, Clock, Star, Users, Shield, Award, Location } from 'lucide-react';
+import { Phone, Mail, Clock, Star, Users, Shield, Award, Locate, Facebook, Twitter, Instagram } from 'lucide-react';
 import { Language } from '@/utils/translations';
 
 interface FooterProps {
@@ -11,7 +12,6 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
     <footer className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          
           {/* Contact Information */}
           <div>
             <h3 className="text-xl font-bold mb-6 text-blue-400">
@@ -31,7 +31,7 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
                 <span>info@4phone.ma</span>
               </div>
               <div className="flex items-center space-x-3 space-x-reverse">
-                <Location className="text-blue-400" size={20} />
+                <Locate className="text-blue-400" size={20} />
                 <span>
                   {language === 'ar'
                     ? 'الدروة، قسارية المدينة، المغرب'
