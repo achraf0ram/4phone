@@ -1,7 +1,8 @@
+
 import React, { useState, useRef } from 'react';
-import { MessageCircle, X, Send, Bot, User, Image as ImageIcon, MessageSquare, Key, Delete } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Image as ImageIcon, MessageSquare } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
-import { toast } from "@/components/ui/use-toast"; // إضافة التوست
+import { toast } from "@/components/ui/use-toast";
 
 interface ChatBotProps {
   language: Language;
@@ -31,41 +32,16 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('perplexityApiKey') || '');
-  const [showApiInput, setShowApiInput] = useState(!localStorage.getItem('perplexityApiKey'));
+  // إزالة apiKey
+  // const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('perplexityApiKey') || '');
+  // const [showApiInput, setShowApiInput] = useState(!localStorage.getItem('perplexityApiKey'));
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [showApiKeyErrorAction, setShowApiKeyErrorAction] = useState(false); // إضافة حالة جديدة
+  const [showApiKeyErrorAction, setShowApiKeyErrorAction] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // حفظ Perplexity API KEY محلياً
-  const handleSaveApiKey = () => {
-    if (apiKey.trim().length > 10) {
-      localStorage.setItem('perplexityApiKey', apiKey.trim());
-      setShowApiInput(false);
-      setShowApiKeyErrorAction(false);
-      toast({
-        title: language === "ar" ? "تم حفظ المفتاح" : "Clé API enregistrée",
-        description: language === "ar"
-          ? "تم تحديث مفتاح Perplexity بنجاح"
-          : "Clé Perplexity API mise à jour avec succès",
-      });
-    }
-  };
-
-  // حذف مفتاح Perplexity API من التخزين المحلي
-  const handleDeleteApiKey = () => {
-    localStorage.removeItem('perplexityApiKey');
-    setApiKey('');
-    setShowApiInput(false);
-    toast({
-      title: language === "ar" ? "تم حذف المفتاح" : "Clé supprimée",
-      description: language === "ar"
-        ? "تم إزالة مفتاح Perplexity بنجاح."
-        : "Clé Perplexity API supprimée avec succès.",
-    });
-  };
+  // إزالة منطق حفظ api key وحذفه
 
   // اختيار صورة
   const handleSelectImage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,101 +106,28 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
       return;
     }
 
-    // ذكاء اصطناعي (Perplexity) للرد على الرسائل/المشاكل
-    try {
-      // رسالة نظام (prompt)
-      let prompt = '';
-      if (language === "ar") {
-        prompt = "أنت مساعد محترف في إصلاح الهواتف والرد على مشاكلها، اجب باختصار ودقة وبأسلوب ودود. إذا أرسل المستخدم صورة، حاول تقديم نصائح عامة حول مشاكل الهواتف الشائعة.";
-      } else {
-        prompt = "Vous êtes un assistant professionnel dans la réparation de téléphones. Répondez brièvement, précisément et avec amabilité. Si une image est envoyée, essayez de donner des conseils généraux sur les problèmes courants des téléphones.";
-      }
-
-      // تحضير الرسائل
-      const messagesForApi: any[] = [
-        { role: "system", content: prompt }
-      ];
-
-      let messageContent = inputText;
-      if (selectedImage && !inputText.trim()) {
-        messageContent = language === "ar" ? "أرفقت صورة لمشكلة في هاتفي، هل يمكنك مساعدتي؟" : "J'ai attaché une image d'un problème avec mon téléphone, pouvez-vous m'aider?";
-      } else if (selectedImage && inputText.trim()) {
-        messageContent = inputText + (language === "ar" ? " (مع صورة مرفقة)" : " (avec image attachée)");
-      }
-
-      messagesForApi.push({ role: "user", content: messageContent });
-
-      // طلب إلى Perplexity
-      const apiMsg = {
-        model: 'llama-3.1-sonar-small-128k-online',
-        messages: messagesForApi,
-        temperature: 0.2,
-        top_p: 0.9,
-        max_tokens: 350,
-        return_images: false,
-        return_related_questions: false
-      };
-
-      const res = await fetch('https://api.perplexity.ai/chat/completions', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(apiMsg)
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      const data = await res.json();
-      let botText = (data.choices && data.choices[0]?.message?.content) || (
-        language === 'ar'
-          ? 'عذرًا لم أتمكن من الفهم. أعد المحاولة أو تواصل معنا عبر واتساب!'
-          : "Je n'ai pas compris, merci de réessayer ou de nous contacter via WhatsApp."
-      );
-
-      setMessages(prev => [
-        ...prev,
-        {
-          id: prev.length + 2,
-          text: botText,
-          isBot: true,
-          timestamp: new Date()
-        }
-      ]);
-      setShowApiKeyErrorAction(false); // إخفاء الزر عند نجاح الاستجابة
-    } catch (err) {
-      console.error('Error calling Perplexity API:', err);
+    // هنا يمكن إضافة ذكاء اصطناعي أو رسالة افتراضية
+    setTimeout(() => {
       setMessages(prev => [
         ...prev,
         {
           id: prev.length + 2,
           text: language === 'ar'
-            ? 'حدث خطأ أثناء محاولة الرد الآلي. تأكد من صحة مفتاح Perplexity API أو تواصل معنا مباشرة عبر واتساب.'
-            : "Erreur lors de la génération de la réponse AI. Veuillez vérifier votre clé API ou nous contacter directement via WhatsApp.",
+            ? 'عذرًا لم يتم دمج خدمة الرد الآلي تلقائيًا حالياً. للتواصل بشأن العطل، يمكنك استخدام زر واتساب أدناه.'
+            : "Le service de réponse automatique n'est pas activé pour le moment. Veuillez contacter via WhatsApp.",
           isBot: true,
           timestamp: new Date()
         }
       ]);
-      toast({
-        title: language === 'ar' ? 'خطأ المفتاح' : 'Erreur de clé',
-        description: language === 'ar'
-          ? 'يرجى التأكد من مفتاح Perplexity API أو تغييره.'
-          : "Veuillez vérifier ou remplacer votre clé Perplexity API.",
-        variant: "destructive"
-      });
-      setShowApiKeyErrorAction(true); // إظهار الزر عند وقوع الخطأ
-    } finally {
       setIsTyping(false);
+      setShowApiKeyErrorAction(false);
       handleRemoveImage();
-    }
+    }, 1000);
   };
 
   return (
     <>
-      {/* Chat Button - Enhanced with pulse animation */}
+      {/* Chat Button */}
       <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
         <button
           onClick={() => setIsOpen(true)}
@@ -234,44 +137,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
         </button>
       </div>
 
-      {/* نافذة سؤال مفتاح Perplexity */}
-      {isOpen && showApiInput && (
-        <div className="fixed inset-4 md:bottom-6 md:right-6 md:inset-auto md:w-96 md:h-fit bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
-          <div className="p-6">
-            <div className="font-bold text-lg mb-3 flex items-center gap-2">
-              <Key size={18} className="text-blue-500" />
-              {language === "ar" ? "أدخل مفتاح Perplexity API" : "Renseignez la clé API Perplexity"}
-              <button
-                onClick={handleDeleteApiKey}
-                className="ml-auto p-1 rounded hover:bg-red-50 transition"
-                title={language === "ar" ? "حذف المفتاح الحالي" : "Supprimer la clé actuelle"}
-              >
-                <Delete size={16} className="text-red-600" />
-              </button>
-            </div>
-            <input
-              type="password"
-              placeholder="API Key..."
-              value={apiKey}
-              onChange={e => setApiKey(e.target.value)}
-              className="border p-3 rounded w-full mb-4"
-            />
-            <button
-              className="bg-blue-600 text-white w-full rounded py-2 hover:bg-blue-700 mb-2 disabled:opacity-50"
-              onClick={handleSaveApiKey}
-              disabled={apiKey.length < 12}
-            >
-              {language === "ar" ? "حفظ ومتابعة" : "Enregistrer & Continuer"}
-            </button>
-            <div className="text-xs text-gray-500">
-              {language === "ar" ? "ستُخزن محلياً ولن ترسل خارج جهازك" : "La clé API sera sauvegardée localement."}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* لم يعد هناك showApiInput ولا إدخال api key */}
 
-      {/* Chat Window - Enhanced design */}
-      {isOpen && !showApiInput && (
+      {/* Chat Window */}
+      {isOpen && (
         <div className="fixed inset-4 md:bottom-6 md:right-6 md:inset-auto md:w-96 md:h-[500px] bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 text-white p-4 rounded-t-xl flex items-center justify-between">
@@ -325,15 +194,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
                         <img src={message.imageUrl} alt="upload" className="mb-2 rounded max-h-40 object-contain border" />
                       )}
                       <p className="text-xs md:text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
-                      {/* زر إدخال مفتاح جديد عند الخطأ في المفتاح */}
-                      {isErrorApiKeyMsg && showApiKeyErrorAction && (
-                        <button
-                          onClick={() => setShowApiInput(true)}
-                          className="mt-2 bg-red-600 hover:bg-red-700 text-white rounded px-3 py-1 text-xs transition-colors"
-                        >
-                          {language === "ar" ? "تغيير مفتاح Perplexity" : "Changer la clé Perplexity"}
-                        </button>
-                      )}
+                      {/* حذف زر تغيير المفتاح */}
                       {/* إذا هي رسالة البوت وتخص التواصل/واتساب, أظهر زر الفتح */}
                       {message.isBot && isContactIntent(message.text) && (
                         <a
@@ -439,3 +300,4 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
 };
 
 export default ChatBot;
+
