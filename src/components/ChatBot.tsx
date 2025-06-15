@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { MessageCircle, X, Send, Bot, User, Image as ImageIcon, MessageSquare } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
 
 interface ChatBotProps {
@@ -13,152 +13,188 @@ interface Message {
   timestamp: Date;
 }
 
+// نوع الرسالة يدعم الصور الآن
+interface Message {
+  id: number;
+  text: string;
+  isBot: boolean;
+  timestamp: Date;
+  imageUrl?: string;
+}
+
+const WHATSAPP_NUMBER = '+212620740008';
+
 const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: language === 'ar' ? 'مرحباً بك في 4phone! 👋 أنا مساعدك الذكي. كيف يمكنني مساعدتك اليوم؟ 📱✨' : 'Bienvenue chez 4phone! 👋 Je suis votre assistant intelligent. Comment puis-je vous aider aujourd\'hui? 📱✨',
+      text: language === 'ar' ? 'مرحباً بك في 4phone! 👋 أنا مساعدك الذكي الجديد. اسألني عن أي عطل في هاتفك، أو أرسل صورة للمشكلة. للتواصل المباشر اضغط زر واتساب في أي وقت. 📱✨' : 'Bienvenue chez 4phone! 👋 Je suis votre assistant intelligent. Posez-moi vos questions sur vos pannes, ou envoyez une photo. Pour un contact direct, cliquez sur WhatsApp à tout moment. 📱✨',
       isBot: true,
       timestamp: new Date()
     }
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('perplexityApiKey') || '');
+  const [showApiInput, setShowApiInput] = useState(!localStorage.getItem('perplexityApiKey'));
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // حفظ Prisma API KEY محلياً
+  const handleSaveApiKey = () => {
+    if (apiKey.trim().length > 10) {
+      localStorage.setItem('perplexityApiKey', apiKey.trim());
+      setShowApiInput(false);
+    }
+  };
+
+  // اختيار صورة
+  const handleSelectImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedImage(event.target.files[0]);
+      setPreviewUrl(URL.createObjectURL(event.target.files[0]));
+    }
+  };
+
+  // إزالة الصورة
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // كشف هل المستخدم يريد تواصل واتساب
+  const isContactIntent = (txt: string) => {
+    const arMatch = /(اتصل|تواصل|رقم|whatsapp|واتساب|تسأل|اتواص|تواصل معي)/i;
+    const frMatch = /(contact|appeler|numéro|whatsapp|wa.me)/i;
+    return arMatch.test(txt) || frMatch.test(txt);
+  };
+
+  // إرسال رسالة (نص + صورة إن وجدت)
   const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
+    if ((!inputText.trim() && !selectedImage) || isTyping) return;
 
     const userMessage: Message = {
       id: messages.length + 1,
       text: inputText,
       isBot: false,
-      timestamp: new Date()
+      timestamp: new Date(),
+      imageUrl: previewUrl || undefined,
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
     setIsTyping(true);
 
-    // Simulate bot response with more realistic delay
-    setTimeout(() => {
-      const botResponse = getBotResponse(inputText, language);
-      const botMessage: Message = {
-        id: messages.length + 2,
-        text: botResponse,
-        isBot: true,
-        timestamp: new Date()
+    // إذا المستخدم يطلب واتساب، أعطيه زرا مباشرا
+    if (isContactIntent(userMessage.text)) {
+      setTimeout(() => {
+        setMessages(prev => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            text:
+              language === 'ar'
+                ? 'للتواصل المباشر اضغط على الزر أدناه لفتح واتساب مع خدمة العملاء.'
+                : 'Cliquez sur le bouton ci-dessous pour discuter directement sur WhatsApp!',
+            isBot: true,
+            timestamp: new Date()
+          }
+        ]);
+        setIsTyping(false);
+      }, 700);
+      return;
+    }
+
+    // ذكاء اصطناعي (Perplexity) للرد على الرسائل/المشاكل مع إرسال صورة (إن وجدت)
+    try {
+      let imgBase64 = '';
+      if (selectedImage) {
+        // تحويل الصورة Base64 لرفعها على Perplexity (أغلب النماذج تقبل نصي فقط - نرسل وصف للصورة)
+        const reader = new FileReader();
+        imgBase64 = await new Promise<string>((resolve, reject) => {
+          reader.onload = e => resolve((e.target?.result as string) || '');
+          reader.onerror = reject;
+          reader.readAsDataURL(selectedImage);
+        });
+      }
+
+      // رسالة نظام (prompt)
+      let prompt = '';
+      if (language === "ar") {
+        prompt = "أنت مساعد محترف في إصلاح الهواتف والرد على مشاكلها، اجب باختصار ودقة وبأسلوب ودود، وإذا أرسل المستخدم صورة حاول تشخيص العطل حسب الوضوح.";
+      } else {
+        prompt = "Vous êtes un assistant professionnel dans la réparation de téléphones. Répondez brièvement, précisément et avec amabilité. Si une image est envoyée, essayez de diagnostiquer la panne si possible.";
+      }
+
+      // تحضير الرسائل مع الصورة كوصف
+      const messagesForApi: any[] = [
+        { role: "system", content: prompt }
+      ];
+      if (selectedImage && imgBase64) {
+        messagesForApi.push({ role: "user", content: (language === "ar" ? "انظر لهذه الصورة:" : "Regardez cette image:") + " [image attached]" });
+      }
+      if (inputText.trim()) {
+        messagesForApi.push({ role: "user", content: inputText });
+      }
+
+      // طلب إلى Perplexity
+      const apiMsg = {
+        model: 'llama-3.1-sonar-small-128k-online',
+        messages: messagesForApi,
+        temperature: 0.2,
+        top_p: 0.9,
+        max_tokens: 350,
+        return_images: false,
+        return_related_questions: false
       };
-      setMessages(prev => [...prev, botMessage]);
+
+      const res = await fetch('https://api.perplexity.ai/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(apiMsg)
+      });
+
+      const data = await res.json();
+      let botText = (data.choices && data.choices[0]?.message?.content) || (
+        language === 'ar'
+          ? 'عذرًا لم أتمكن من الفهم. أعد المحاولة أو تواصل معنا عبر واتساب!'
+          : "Je n'ai pas compris, merci de réessayer ou de nous contacter via WhatsApp."
+      );
+
+      setMessages(prev => [
+        ...prev,
+        {
+          id: prev.length + 2,
+          text: botText,
+          isBot: true,
+          timestamp: new Date()
+        }
+      ]);
+    } catch (err) {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: prev.length + 2,
+          text: language === 'ar'
+            ? 'حدث خطأ أثناء محاولة الرد الآلي. تأكد من صحة مفتاح Perplexity API.'
+            : "Erreur lors de la génération de la réponse AI. Veuillez vérifier votre clé API.",
+          isBot: true,
+          timestamp: new Date()
+        }
+      ]);
+    } finally {
       setIsTyping(false);
-    }, Math.random() * 1000 + 1000); // Random delay between 1-2 seconds
-  };
-
-  function getBotResponse(userInput: string, lang: Language): string {
-    const input = userInput.toLowerCase();
-    
-    // Greetings and basic interactions
-    if (input.includes('مرحبا') || input.includes('السلام') || input.includes('أهلا') || 
-        input.includes('bonjour') || input.includes('salut') || input.includes('hello')) {
-      return lang === 'ar' 
-        ? 'أهلاً وسهلاً بك! 😊 أنا هنا لمساعدتك في كل ما يتعلق بخدمات 4phone. اسأل عن أي شيء!'
-        : 'Bonjour et bienvenue! 😊 Je suis là pour vous aider avec tous les services 4phone. N\'hésitez pas à poser vos questions!';
+      setSelectedImage(null);
+      setPreviewUrl(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
-
-    // Thanks
-    if (input.includes('شكر') || input.includes('merci') || input.includes('thank')) {
-      return lang === 'ar'
-        ? 'العفو! 😊 أي خدمة أخرى يمكنني مساعدتك فيها؟'
-        : 'De rien! 😊 Puis-je vous aider avec autre chose?';
-    }
-
-    // Pricing inquiries
-    if (input.includes('سعر') || input.includes('تكلفة') || input.includes('فلوس') || 
-        input.includes('prix') || input.includes('coût') || input.includes('tarif')) {
-      return lang === 'ar' 
-        ? '💰 أسعارنا تنافسية جداً:\n📱 إصلاح الشاشات: 80-300 درهم\n🔋 بطاريات: 50-150 درهم\n🔊 سماعات: 40-120 درهم\n📞 اتصل بنا للحصول على عرض سعر دقيق لهاتفك!'
-        : '💰 Nos prix sont très compétitifs:\n📱 Réparation écrans: 80-300 dirhams\n🔋 Batteries: 50-150 dirhams\n🔊 Haut-parleurs: 40-120 dirhams\n📞 Appelez-nous pour un devis précis!';
-    }
-    
-    // Warranty inquiries
-    if (input.includes('ضمان') || input.includes('كفالة') || input.includes('garantie')) {
-      return lang === 'ar'
-        ? '🛡️ نوفر ضمان شامل وموثوق:\n📱 الشاشات: 6 أشهر ضمان كامل\n🔋 البطاريات: سنة كاملة\n🔊 السماعات: 4 أشهر\n✅ نستبدل القطعة مجاناً في حالة العيب!'
-        : '🛡️ Nous offrons une garantie complète:\n📱 Écrans: 6 mois de garantie\n🔋 Batteries: 1 an complet\n🔊 Haut-parleurs: 4 mois\n✅ Remplacement gratuit en cas de défaut!';
-    }
-    
-    // Installation services
-    if (input.includes('تركيب') || input.includes('تصليح') || input.includes('إصلاح') ||
-        input.includes('installation') || input.includes('réparation')) {
-      return lang === 'ar'
-        ? '🔧 خدمة التركيب المجانية مع فنيين محترفين:\n⚡ تركيب فوري في المتجر\n🏠 خدمة منزلية متاحة\n👨‍🔧 فريق معتمد ومدرب\n📱 فحص شامل بعد التركيب مجاناً!'
-        : '🔧 Service d\'installation gratuit avec techniciens pro:\n⚡ Installation immédiate en magasin\n🏠 Service à domicile disponible\n👨‍🔧 Équipe certifiée et formée\n📱 Test complet après installation!';
-    }
-    
-    // Delivery services
-    if (input.includes('توصيل') || input.includes('شحن') || input.includes('ديليفري') ||
-        input.includes('livraison') || input.includes('delivery')) {
-      return lang === 'ar'
-        ? '🚚 خدمة التوصيل السريعة:\n🏙️ مجاني داخل المدينة خلال 24 ساعة\n🌍 للمدن الأخرى: 30 درهم فقط\n⚡ توصيل سريع في نفس اليوم متاح\n📦 تغليف آمن ومحكم'
-        : '🚚 Service de livraison rapide:\n🏙️ Gratuit en ville sous 24h\n🌍 Autres villes: seulement 30 dirhams\n⚡ Livraison express le jour même\n📦 Emballage sécurisé';
-    }
-
-    // Phone models and compatibility
-    if (input.includes('هاتف') || input.includes('آيفون') || input.includes('سامسونغ') || input.includes('شاومي') ||
-        input.includes('téléphone') || input.includes('iphone') || input.includes('samsung') || input.includes('xiaomi')) {
-      return lang === 'ar'
-        ? '📱 نتعامل مع جميع الماركات:\n🍎 iPhone (جميع الموديلات)\n📱 Samsung, Huawei, Xiaomi\n🔧 OnePlus, Oppo, Vivo\n❓ لست متأكد من نوع هاتفك؟ أرسل لنا صورة وسنساعدك!'
-        : '📱 Nous travaillons avec toutes les marques:\n🍎 iPhone (tous modèles)\n📱 Samsung, Huawei, Xiaomi\n🔧 OnePlus, Oppo, Vivo\n❓ Pas sûr de votre modèle? Envoyez une photo!';
-    }
-
-    // Store hours and location
-    if (input.includes('وقت') || input.includes('مفتوح') || input.includes('عنوان') || input.includes('موقع') ||
-        input.includes('horaire') || input.includes('ouvert') || input.includes('adresse') || input.includes('localisation')) {
-      return lang === 'ar'
-        ? '🕒 أوقات العمل:\n📅 السبت - الخميس: 9:00 - 21:00\n📅 الجمعة: 14:00 - 21:00\n📍 العنوان: شارع الرئيسي، المدينة\n🗺️ يمكنك العثور علينا بسهولة!'
-        : '🕒 Horaires d\'ouverture:\n📅 Samedi - Jeudi: 9h00 - 21h00\n📅 Vendredi: 14h00 - 21h00\n📍 Adresse: Rue Principale, Ville\n🗺️ Facile à trouver!';
-    }
-
-    // Used phones
-    if (input.includes('مستعمل') || input.includes('قديم') || input.includes('بيع') ||
-        input.includes('occasion') || input.includes('usagé') || input.includes('vendre')) {
-      return lang === 'ar'
-        ? '📱 خدمات الهواتف المستعملة:\n💰 نشتري هاتفك بأفضل سعر\n🔍 تقييم مجاني وفوري\n✅ هواتف مستعملة مفحوصة ومضمونة\n📞 أحضر هاتفك للتقييم!'
-        : '📱 Services téléphones d\'occasion:\n💰 Nous achetons votre téléphone au meilleur prix\n🔍 Évaluation gratuite et immédiate\n✅ Téléphones d\'occasion vérifiés\n📞 Apportez votre téléphone!';
-    }
-
-    // Technical problems
-    if (input.includes('مشكلة') || input.includes('عطل') || input.includes('لا يعمل') ||
-        input.includes('problème') || input.includes('panne') || input.includes('marche pas')) {
-      return lang === 'ar'
-        ? '🔧 حل المشاكل التقنية:\n🔍 تشخيص مجاني للمشكلة\n⚡ إصلاح سريع في معظم الحالات\n💡 استشارة تقنية مجانية\n📞 اتصل بنا أو احضر هاتفك للفحص!'
-        : '🔧 Résolution problèmes techniques:\n🔍 Diagnostic gratuit du problème\n⚡ Réparation rapide dans la plupart des cas\n💡 Consultation technique gratuite\n📞 Appelez ou apportez votre téléphone!';
-    }
-
-    // Contact and communication
-    if (input.includes('اتصال') || input.includes('تواصل') || input.includes('رقم') ||
-        input.includes('contact') || input.includes('appeler') || input.includes('numéro')) {
-      return lang === 'ar'
-        ? '📞 تواصل معنا بسهولة:\n📱 الهاتف: 212612345678\n💬 واتساب متاح 24/7\n📧 البريد الإلكتروني متاح\n🏪 زيارة المتجر مرحب بها دائماً!'
-        : '📞 Contactez-nous facilement:\n📱 Téléphone: 212612345678\n💬 WhatsApp disponible 24/7\n📧 Email disponible\n🏪 Visites en magasin toujours bienvenues!';
-    }
-
-    // Default responses with helpful suggestions
-    const defaultResponses = {
-      ar: [
-        '🤔 لم أفهم سؤالك تماماً. يمكنك السؤال عن:\n💰 الأسعار والتكاليف\n🔧 خدمات الإصلاح\n🛡️ الضمان والكفالة\n🚚 التوصيل والشحن\n📱 أنواع الهواتف المدعومة',
-        '💡 أقترح عليك الاتصال بنا على 212612345678 للحصول على مساعدة مفصلة، أو يمكنك زيارة متجرنا مباشرة!',
-        '🎯 هل تريد معرفة المزيد عن خدماتنا؟ اسأل عن الإصلاح، قطع الغيار، الأسعار، أو أي خدمة أخرى!'
-      ],
-      fr: [
-        '🤔 Je n\'ai pas bien compris votre question. Vous pouvez demander sur:\n💰 Les prix et coûts\n🔧 Services de réparation\n🛡️ Garantie\n🚚 Livraison\n📱 Types de téléphones supportés',
-        '💡 Je suggère de nous appeler au 212612345678 pour une aide détaillée, ou visitez directement notre magasin!',
-        '🎯 Voulez-vous en savoir plus sur nos services? Demandez sur la réparation, pièces détachées, prix, ou tout autre service!'
-      ]
-    };
-
-    const responses = defaultResponses[lang];
-    return responses[Math.floor(Math.random() * responses.length)];
   };
 
   return (
@@ -173,8 +209,25 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
         </button>
       </div>
 
+      {/* نافذة سؤال مفتاح Perplexity */}
+      {isOpen && showApiInput && (
+        <div className="fixed inset-4 md:bottom-6 md:right-6 md:inset-auto md:w-96 md:h-fit bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
+          <div className="p-6">
+            <div className="font-bold text-lg mb-3">🔑 {language === "ar" ? "أدخل مفتاح Perplexity API" : "Renseignez la clé API Perplexity"}</div>
+            <input type="password" placeholder="API Key..." value={apiKey} onChange={e => setApiKey(e.target.value)}
+              className="border p-3 rounded w-full mb-4"/>
+            <button
+              className="bg-blue-600 text-white w-full rounded py-2 hover:bg-blue-700 mb-2"
+              onClick={handleSaveApiKey}
+              disabled={apiKey.length < 12}
+            >{language === "ar" ? "حفظ ومتابعة" : "Enregistrer & Continuer"}</button>
+            <div className="text-xs text-gray-500">{language === "ar" ? "ستُخزن محلياً ولن ترسل خارج جهازك" : "La clé API sera sauvegardée localement."}</div>
+          </div>
+        </div>
+      )}
+
       {/* Chat Window - Enhanced design */}
-      {isOpen && (
+      {isOpen && !showApiInput && (
         <div className="fixed inset-4 md:bottom-6 md:right-6 md:inset-auto md:w-96 md:h-[500px] bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
           {/* Header - Enhanced with gradient */}
           <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 text-white p-4 rounded-t-xl flex items-center justify-between">
@@ -199,7 +252,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
             </button>
           </div>
 
-          {/* Messages - Enhanced scrolling */}
+          {/* الرسائل - مع عرض الصور إن وجدت */}
           <div className="flex-1 p-3 md:p-4 overflow-y-auto space-y-3 bg-gradient-to-b from-gray-50 to-white">
             {messages.map((message) => (
               <div
@@ -215,13 +268,27 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
                     )}
                   </div>
                   <div
-                    className={`p-3 md:p-3 rounded-2xl shadow-sm ${
-                      message.isBot
-                        ? 'bg-white text-gray-800 border border-gray-100'
-                        : 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
+                    className={`p-3 md:p-3 rounded-2xl shadow-sm ${message.isBot
+                      ? 'bg-white text-gray-800 border border-gray-100'
+                      : 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
                     }`}
                   >
+                    {/* إذا الرسالة بها صورة */}
+                    {message.imageUrl && (
+                      <img src={message.imageUrl} alt="upload" className="mb-2 rounded max-h-40 object-contain border" />
+                    )}
                     <p className="text-xs md:text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
+                    {/* إذا هي رسالة البوت وتخص التواصل/واتساب, أظهر زر الفتح */}
+                    {message.isBot && isContactIntent(message.text) && (
+                      <a
+                        href={`https://wa.me/${WHATSAPP_NUMBER.replace('+', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-3 py-1 mt-2 text-white bg-green-600 hover:bg-green-700 rounded shadow transition space-x-1"
+                      >
+                        <MessageSquare size={16} /> <span>{language === "ar" ? "تواصل عبر واتساب" : "Contacter via WhatsApp"}</span>
+                      </a>
+                    )}
                     <div className={`text-xs mt-1 ${message.isBot ? 'text-gray-500' : 'text-blue-100'}`}>
                       {message.timestamp.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' })}
                     </div>
@@ -229,7 +296,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
                 </div>
               </div>
             ))}
-            
+
             {isTyping && (
               <div className="flex justify-start animate-fade-in">
                 <div className="flex items-start space-x-2 space-x-reverse">
@@ -248,9 +315,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
             )}
           </div>
 
-          {/* Input - Enhanced design */}
+          {/* إدخال نص وصورة اسفل الشات */}
           <div className="p-3 md:p-4 border-t border-gray-200 bg-gray-50">
-            <div className="flex space-x-2 space-x-reverse">
+            <div className="flex items-end space-x-2 space-x-reverse">
               <input
                 type="text"
                 value={inputText}
@@ -258,28 +325,55 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 placeholder={language === 'ar' ? 'اكتب رسالتك هنا...' : 'Tapez votre message ici...'}
                 className="flex-1 p-3 text-sm border border-gray-200 rounded-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white shadow-sm"
+                disabled={isTyping}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className={`p-3 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-full transition-all duration-300 shadow-sm ${selectedImage ? 'border-2 border-blue-400' : ''}`}
+                title={language === 'ar' ? "إرفاق صورة" : "Ajouter image"}
+                disabled={isTyping}
+              >
+                <ImageIcon size={16} />
+              </button>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleSelectImage}
+                disabled={isTyping}
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!inputText.trim() || isTyping}
+                disabled={(!inputText.trim() && !selectedImage) || isTyping}
                 className="p-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transform hover:scale-105"
               >
                 <Send size={14} className="md:w-4 md:h-4" />
               </button>
             </div>
+            {/* إظهار معاينة الصورة قبل الإرسال */}
+            {previewUrl && (
+              <div className="flex mt-2 items-center space-x-2 space-x-reverse">
+                <img src={previewUrl} alt="preview" className="h-16 w-16 rounded border object-contain" />
+                <button onClick={handleRemoveImage} className="text-xs text-red-600 hover:underline">{language === 'ar' ? "حذف الصورة" : "Supprimer l'image"}</button>
+              </div>
+            )}
           </div>
         </div>
       )}
-      
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-      `}</style>
+
+      {/* تحريك Fade-in (بديل style jsx) */}
+      <style>
+        {`
+          .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
     </>
   );
 };
