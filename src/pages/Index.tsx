@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -104,14 +103,10 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
           </Carousel>
         </div>
 
-        {/* Moving News Ticker - Moved here after carousel */}
+        {/* Moving News Ticker - محدث */}
         <section className="news-ticker py-4 mb-12 rounded-xl">
           <div className="news-ticker-content text-white text-lg font-bold">
-            🔥 عروض حصرية في 4phone • إصلاح فوري مع ضمان 6 أشهر • قطع غيار أصلية 100% • 
-            هواتف مستعملة مفحوصة ومضمونة • خدمة العملاء المتميزة 24/7 • 
-            فريق تقني محترف ومعتمد • أسعار منافسة لا تقبل المقارنة • 
-            تقييم مجاني لهاتفك المستعمل • توصيل مجاني داخل المدينة • 
-            ✨ 4phone - شريكك الموثوق في عالم الهواتف ✨
+            ⚡ منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة 📱💎
           </div>
         </section>
 
@@ -121,9 +116,7 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
             📱 4phone 🔧
           </h2>
           <div className="overflow-hidden">
-            <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed animate-bounce">
-              ⚡ منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة 📱💎
-            </p>
+            {/* تم حذف الوصف المتحرك هنا بناءً على طلبك */}
           </div>
         </div>
 
