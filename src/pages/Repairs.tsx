@@ -279,53 +279,6 @@ const Repairs: React.FC<RepairsProps> = ({ language, onLanguageChange }) => {
         </div>
       </section>
 
-      {/* Warranty Section */}
-      <section className="bg-white py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">
-            {language === 'ar' ? 'ضماناتنا وخدماتنا المميزة' : 'Nos garanties et services de qualité'}
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center group">
-              <div className="bg-gradient-to-r from-blue-500 to-green-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Shield className="text-white" size={36} />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
-                {language === 'ar' ? 'ضمان 6 أشهر' : 'Garantie 6 mois'}
-              </h3>
-              <p className="text-gray-600">
-                {language === 'ar' ? 'ضمان شامل على جميع أعمال الإصلاح' : 'Garantie complète sur tous les travaux de réparation'}
-              </p>
-            </div>
-            
-            <div className="text-center group">
-              <div className="bg-gradient-to-r from-green-500 to-blue-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Clock className="text-white" size={36} />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
-                {language === 'ar' ? 'إصلاح سريع' : 'Réparation rapide'}
-              </h3>
-              <p className="text-gray-600">
-                {language === 'ar' ? 'معظم الإصلاحات تتم في نفس اليوم' : 'La plupart des réparations sont effectuées le jour même'}
-              </p>
-            </div>
-            
-            <div className="text-center group">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Star className="text-white" size={36} />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
-                {language === 'ar' ? 'قطع أصلية' : 'Pièces d\'origine'}
-              </h3>
-              <p className="text-gray-600">
-                {language === 'ar' ? 'نستخدم قطع غيار أصلية مضمونة فقط' : 'Nous n\'utilisons que des pièces détachées d\'origine garanties'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <Footer language={language} />
       {/* إضافة البوت الذكي هنا ليكون ظاهرًا في كل صفحة الإصلاحات */}
