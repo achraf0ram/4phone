@@ -19,6 +19,24 @@ interface IndexProps {
   onLanguageChange: (lang: string) => void;
 }
 
+const newsItemsAr = [
+  "⚡ منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة 📱💎",
+  "🔥 عروض حصرية في 4phone",
+  "✅ إصلاح فوري مع ضمان 6 أشهر",
+  "🛠️ قطع غيار أصلية 100%",
+  "🎉 هواتف مستعملة مضمونة",
+  "📞 خدمة العملاء على مدار الساعة"
+];
+
+const newsItemsFr = [
+  "⚡ Votre plateforme tout-en-un pour la réparation de téléphones, la vente et l'achat de pièces détachées originales et de téléphones d'occasion aux meilleurs prix et au service de la plus haute qualité 📱💎",
+  "🔥 Offres exclusives chez 4phone",
+  "✅ Réparations immédiates avec 6 mois de garantie",
+  "🛠️ Pièces détachées 100% originales",
+  "🎉 Téléphones d'occasion vérifiés",
+  "📞 Service client 24h/24"
+];
+
 const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
   const navigate = useNavigate();
 
@@ -37,7 +55,7 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
     },
     {
       src: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=400&fit=crop",
-      alt: language === 'ar' ? "قطع غيار الهاتف" : "Pièces détachées de téléphone"
+      alt: language === 'ar' ? "قطع غيار الهاتف" : "Pièces غيار الهاتف"
     }
   ];
 
@@ -60,6 +78,18 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
   const handleChatBot = () => {
     console.log('ChatBot button clicked - handled by ChatBot component');
   };
+
+  // اختيار الأخبار حسب اللغة
+  const newsItems = language === 'ar' ? newsItemsAr : newsItemsFr;
+  // دمج كل العناصر مع فواصل مناسبة
+  const newsText = newsItems.join(' • ');
+
+  // تحديد اتجاه الكتابة
+  const direction = language === 'ar' ? 'rtl' : 'ltr';
+  const tickerClass =
+    language === 'ar'
+      ? 'news-ticker-content-ar'
+      : 'news-ticker-content-fr';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -104,9 +134,16 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
         </div>
 
         {/* Moving News Ticker - محدث */}
-        <section className="news-ticker py-4 mb-12 rounded-xl">
-          <div className="news-ticker-content text-white text-lg font-bold">
-            ⚡ منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة 📱💎
+        <section
+          className="news-ticker py-4 mb-12 rounded-xl"
+          dir={direction}
+        >
+          <div
+            className={`${tickerClass} text-white text-lg font-bold`}
+            style={{ direction }}
+            aria-live="polite"
+          >
+            {newsText}
           </div>
         </section>
 
