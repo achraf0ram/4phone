@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
 import Footer from '@/components/Footer';
+import ChatBot from '@/components/ChatBot';
 import { Phone, Wrench, ShoppingCart, Star, Clock, Shield, MessageSquare, AlertCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -327,6 +328,8 @@ const Repairs: React.FC<RepairsProps> = ({ language, onLanguageChange }) => {
 
       {/* Footer */}
       <Footer language={language} />
+      {/* إضافة البوت الذكي هنا ليكون ظاهرًا في كل صفحة الإصلاحات */}
+      <ChatBot language={language} />
     </div>
   );
 };
