@@ -102,22 +102,23 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-10">
-          {/* عنوان رئيسي مطابق للصورة: "مرحبًا بك في phone" */}
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 flex flex-col items-center justify-center gap-4">
-            <span className="text-5xl md:text-6xl font-bold" style={{ color: "#2563eb" }}>
-              <span>
-                مرحباً&nbsp;بك&nbsp;في&nbsp;
-                <span
-                  className="font-extrabold"
-                  style={{
-                    background: 'linear-gradient(90deg,#2563eb 10%,#7c3aed 60%,#10b981 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  phone
-                </span>
+          {/* عنوان منصة جذاب مع إبراز اسم 4phone */}
+          <h1
+            className="text-3xl md:text-5xl font-bold mb-4 flex flex-col items-center justify-center gap-4"
+          >
+            <span className="text-gray-800">
+              {/* Arabic only for now per your requests */}
+              منصتك الشاملة لخدمات الهواتف الذكية&nbsp;
+              <span
+                className="font-extrabold"
+                style={{
+                  background: 'linear-gradient(90deg,#2563eb 10%,#7c3aed 60%,#10b981 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                4phone
               </span>
             </span>
           </h1>
