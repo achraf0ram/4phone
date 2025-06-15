@@ -102,22 +102,27 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-10">
-          {/* عنوان ملون ديناميكي كما في الصورة */}
+          {/* عنوان رئيسي مطابق للصورة: "مرحبًا بك في phone" */}
           <h1 className="text-5xl md:text-6xl font-bold mb-4 flex flex-col items-center justify-center gap-4">
-            <span className="text-5xl md:text-6xl font-bold text-blue-700">
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 bg-clip-text text-transparent">
-                مرحباً بك في{' '}
-                <span className="font-extrabold" style={{
-                  background: 'linear-gradient(90deg,#2563eb 10%,#7c3aed 60%,#10b981 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}>phone</span>
+            <span className="text-5xl md:text-6xl font-bold" style={{ color: "#2563eb" }}>
+              <span>
+                مرحباً&nbsp;بك&nbsp;في&nbsp;
+                <span
+                  className="font-extrabold"
+                  style={{
+                    background: 'linear-gradient(90deg,#2563eb 10%,#7c3aed 60%,#10b981 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  phone
+                </span>
               </span>
             </span>
           </h1>
         </div>
-
+        
         {/* Carousel Section */}
         <div className="mb-8 max-w-4xl mx-auto">
           <div ref={emblaRef}>
@@ -252,4 +257,3 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
 };
 
 export default Index;
-
