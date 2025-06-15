@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Phone, Mail, Clock, Star, Users, Shield, Award, Locate, Facebook, Twitter, Instagram } from 'lucide-react';
 import { Language } from '@/utils/translations';
@@ -18,10 +17,6 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
               {language === 'ar' ? 'معلومات التواصل' : 'Informations de contact'}
             </h3>
             <div className="space-y-4">
-              <div className="flex items-center space-x-3 space-x-reverse">
-                <Phone className="text-blue-400" size={20} />
-                <span>+212 6 12 34 56 78</span>
-              </div>
               <div className="flex items-center space-x-3 space-x-reverse">
                 <Phone className="text-blue-400" size={20} />
                 <span>+212620740008</span>
