@@ -1,6 +1,5 @@
-
 import React, { useState, useRef } from 'react';
-import { MessageCircle, X, Send, Bot, User, Image as ImageIcon, MessageSquare } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Image as ImageIcon, MessageSquare, Key, Delete } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
 import { toast } from "@/components/ui/use-toast"; // إضافة التوست
 
@@ -53,6 +52,19 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
           : "Clé Perplexity API mise à jour avec succès",
       });
     }
+  };
+
+  // حذف مفتاح Perplexity API من التخزين المحلي
+  const handleDeleteApiKey = () => {
+    localStorage.removeItem('perplexityApiKey');
+    setApiKey('');
+    setShowApiInput(false);
+    toast({
+      title: language === "ar" ? "تم حذف المفتاح" : "Clé supprimée",
+      description: language === "ar"
+        ? "تم إزالة مفتاح Perplexity بنجاح."
+        : "Clé Perplexity API supprimée avec succès.",
+    });
   };
 
   // اختيار صورة
@@ -226,7 +238,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
       {isOpen && showApiInput && (
         <div className="fixed inset-4 md:bottom-6 md:right-6 md:inset-auto md:w-96 md:h-fit bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
           <div className="p-6">
-            <div className="font-bold text-lg mb-3">🔑 {language === "ar" ? "أدخل مفتاح Perplexity API" : "Renseignez la clé API Perplexity"}</div>
+            <div className="font-bold text-lg mb-3 flex items-center gap-2">
+              <Key size={18} className="text-blue-500" />
+              {language === "ar" ? "أدخل مفتاح Perplexity API" : "Renseignez la clé API Perplexity"}
+              <button
+                onClick={handleDeleteApiKey}
+                className="ml-auto p-1 rounded hover:bg-red-50 transition"
+                title={language === "ar" ? "حذف المفتاح الحالي" : "Supprimer la clé actuelle"}
+              >
+                <Delete size={16} className="text-red-600" />
+              </button>
+            </div>
             <input
               type="password"
               placeholder="API Key..."
