@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -103,17 +102,14 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
       <section className="container mx-auto px-4 py-20">
 
         <div className="text-center mb-10">
-          {/* عنوان منصة جذاب مع إبراز اسم 4phone */}
-          <h1
-            className="text-3xl md:text-5xl font-bold mb-4 flex flex-col items-center justify-center gap-4"
-          >
-            <span className="text-gray-800">
-              {/* Arabic only for now per your requests */}
-              منصتك الشاملة لخدمات الهواتف الذكية&nbsp;
+          {/* عنوان جذاب مع إبراز اسم المنصة 4phone بتدرج لوني */}
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-6 flex flex-col items-center justify-center gap-4">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-green-500">
+              اكتشف منصتك الأولى لإصلاح وبيع الهواتف&nbsp;
               <span
-                className="font-extrabold"
+                className="font-black"
                 style={{
-                  background: 'linear-gradient(90deg,#2563eb 10%,#7c3aed 60%,#10b981 100%)',
+                  background: 'linear-gradient(90deg,#10b981 10%,#2563eb 70%,#f59e42 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
