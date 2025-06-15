@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { MessageCircle, X, Send, Bot, User, Image as ImageIcon, MessageSquare } from 'lucide-react';
 import { getTranslation, Language } from '@/utils/translations';
+import { toast } from "@/components/ui/use-toast"; // إضافة التوست
 
 interface ChatBotProps {
   language: Language;
@@ -22,7 +23,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: language === 'ar' ? 'مرحباً بك في 4phone! 👋 أنا مساعدك الذكي الجديد. اسألني عن أي عطل في هاتفك، أو أرسل صورة للمشكلة. للتواصل المباشر اضغط زر واتساب في أي وقت. 📱✨' : 'Bienvenue chez 4phone! 👋 Je suis votre assistant intelligent. Posez-moi vos questions sur vos pannes, ou envoyez une photo. Pour un contact direct, cliquez sur WhatsApp à tout moment. 📱✨',
+      text: language === 'ar'
+        ? 'مرحباً بك في 4phone! 👋 أنا مساعدك الذكي الجديد. اسألني عن أي عطل في هاتفك، أو أرسل صورة للمشكلة. للتواصل المباشر اضغط زر واتساب في أي وقت. 📱✨'
+        : 'Bienvenue chez 4phone! 👋 Je suis votre assistant intelligent. Posez-moi vos questions sur vos pannes, ou envoyez une photo. Pour un contact direct, cliquez sur WhatsApp à tout moment. 📱✨',
       isBot: true,
       timestamp: new Date()
     }
@@ -33,6 +36,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
   const [showApiInput, setShowApiInput] = useState(!localStorage.getItem('perplexityApiKey'));
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showApiKeyErrorAction, setShowApiKeyErrorAction] = useState(false); // إضافة حالة جديدة
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,6 +45,13 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
     if (apiKey.trim().length > 10) {
       localStorage.setItem('perplexityApiKey', apiKey.trim());
       setShowApiInput(false);
+      setShowApiKeyErrorAction(false);
+      toast({
+        title: language === "ar" ? "تم حفظ المفتاح" : "Clé API enregistrée",
+        description: language === "ar"
+          ? "تم تحديث مفتاح Perplexity بنجاح"
+          : "Clé Perplexity API mise à jour avec succès",
+      });
     }
   };
 
@@ -121,14 +132,14 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
       const messagesForApi: any[] = [
         { role: "system", content: prompt }
       ];
-      
+
       let messageContent = inputText;
       if (selectedImage && !inputText.trim()) {
         messageContent = language === "ar" ? "أرفقت صورة لمشكلة في هاتفي، هل يمكنك مساعدتي؟" : "J'ai attaché une image d'un problème avec mon téléphone, pouvez-vous m'aider?";
       } else if (selectedImage && inputText.trim()) {
         messageContent = inputText + (language === "ar" ? " (مع صورة مرفقة)" : " (avec image attachée)");
       }
-      
+
       messagesForApi.push({ role: "user", content: messageContent });
 
       // طلب إلى Perplexity
@@ -171,6 +182,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
           timestamp: new Date()
         }
       ]);
+      setShowApiKeyErrorAction(false); // إخفاء الزر عند نجاح الاستجابة
     } catch (err) {
       console.error('Error calling Perplexity API:', err);
       setMessages(prev => [
@@ -184,6 +196,14 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
           timestamp: new Date()
         }
       ]);
+      toast({
+        title: language === 'ar' ? 'خطأ المفتاح' : 'Erreur de clé',
+        description: language === 'ar'
+          ? 'يرجى التأكد من مفتاح Perplexity API أو تغييره.'
+          : "Veuillez vérifier ou remplacer votre clé Perplexity API.",
+        variant: "destructive"
+      });
+      setShowApiKeyErrorAction(true); // إظهار الزر عند وقوع الخطأ
     } finally {
       setIsTyping(false);
       handleRemoveImage();
@@ -194,7 +214,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
     <>
       {/* Chat Button - Enhanced with pulse animation */}
       <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
-        <button 
+        <button
           onClick={() => setIsOpen(true)}
           className="bg-gradient-to-r from-blue-500 to-green-500 text-white p-3 md:p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 animate-pulse"
         >
@@ -207,10 +227,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
         <div className="fixed inset-4 md:bottom-6 md:right-6 md:inset-auto md:w-96 md:h-fit bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
           <div className="p-6">
             <div className="font-bold text-lg mb-3">🔑 {language === "ar" ? "أدخل مفتاح Perplexity API" : "Renseignez la clé API Perplexity"}</div>
-            <input 
-              type="password" 
-              placeholder="API Key..." 
-              value={apiKey} 
+            <input
+              type="password"
+              placeholder="API Key..."
+              value={apiKey}
               onChange={e => setApiKey(e.target.value)}
               className="border p-3 rounded w-full mb-4"
             />
@@ -231,7 +251,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
       {/* Chat Window - Enhanced design */}
       {isOpen && !showApiInput && (
         <div className="fixed inset-4 md:bottom-6 md:right-6 md:inset-auto md:w-96 md:h-[500px] bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
-          {/* Header - Enhanced with gradient */}
+          {/* Header */}
           <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 text-white p-4 rounded-t-xl flex items-center justify-between">
             <div className="flex items-center space-x-2 space-x-reverse">
               <div className="bg-white bg-opacity-20 p-1.5 rounded-full">
@@ -246,7 +266,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
                 </div>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => setIsOpen(false)}
               className="text-white hover:text-gray-200 transition-colors p-1 hover:bg-white hover:bg-opacity-20 rounded-full"
             >
@@ -254,51 +274,64 @@ const ChatBot: React.FC<ChatBotProps> = ({ language }) => {
             </button>
           </div>
 
-          {/* الرسائل - مع عرض الصور إن وجدت */}
+          {/* الرسائل */}
           <div className="flex-1 p-3 md:p-4 overflow-y-auto space-y-3 bg-gradient-to-b from-gray-50 to-white">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.isBot ? 'justify-start' : 'justify-end'} animate-fade-in`}
-              >
-                <div className={`flex items-start space-x-2 space-x-reverse max-w-[85%] md:max-w-[75%] ${message.isBot ? 'flex-row' : 'flex-row-reverse'}`}>
-                  <div className={`p-1.5 md:p-2 rounded-full ${message.isBot ? 'bg-blue-100' : 'bg-green-100'} shadow-sm`}>
-                    {message.isBot ? (
-                      <Bot size={12} className="md:w-4 md:h-4 text-blue-600" />
-                    ) : (
-                      <User size={12} className="md:w-4 md:h-4 text-green-600" />
-                    )}
-                  </div>
-                  <div
-                    className={`p-3 md:p-3 rounded-2xl shadow-sm ${message.isBot
-                      ? 'bg-white text-gray-800 border border-gray-100'
-                      : 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
-                    }`}
-                  >
-                    {/* إذا الرسالة بها صورة */}
-                    {message.imageUrl && (
-                      <img src={message.imageUrl} alt="upload" className="mb-2 rounded max-h-40 object-contain border" />
-                    )}
-                    <p className="text-xs md:text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
-                    {/* إذا هي رسالة البوت وتخص التواصل/واتساب, أظهر زر الفتح */}
-                    {message.isBot && isContactIntent(message.text) && (
-                      <a
-                        href={`https://wa.me/${WHATSAPP_NUMBER.replace('+', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center px-3 py-1 mt-2 text-white bg-green-600 hover:bg-green-700 rounded shadow transition space-x-1"
-                      >
-                        <MessageSquare size={16} /> 
-                        <span>{language === "ar" ? "تواصل عبر واتساب" : "Contacter via WhatsApp"}</span>
-                      </a>
-                    )}
-                    <div className={`text-xs mt-1 ${message.isBot ? 'text-gray-500' : 'text-blue-100'}`}>
-                      {message.timestamp.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' })}
+            {messages.map((message, idx) => {
+              // إذا كانت هذه رسالة الخطأ، أظهر الزر تحتها فقط
+              const isErrorApiKeyMsg = message.text.includes("Perplexity API") && message.isBot;
+              return (
+                <div
+                  key={message.id}
+                  className={`flex ${message.isBot ? 'justify-start' : 'justify-end'} animate-fade-in`}
+                >
+                  <div className={`flex items-start space-x-2 space-x-reverse max-w-[85%] md:max-w-[75%] ${message.isBot ? 'flex-row' : 'flex-row-reverse'}`}>
+                    <div className={`p-1.5 md:p-2 rounded-full ${message.isBot ? 'bg-blue-100' : 'bg-green-100'} shadow-sm`}>
+                      {message.isBot ? (
+                        <Bot size={12} className="md:w-4 md:h-4 text-blue-600" />
+                      ) : (
+                        <User size={12} className="md:w-4 md:h-4 text-green-600" />
+                      )}
+                    </div>
+                    <div
+                      className={`p-3 md:p-3 rounded-2xl shadow-sm ${message.isBot
+                        ? 'bg-white text-gray-800 border border-gray-100'
+                        : 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
+                      }`}
+                    >
+                      {/* إذا الرسالة بها صورة */}
+                      {message.imageUrl && (
+                        <img src={message.imageUrl} alt="upload" className="mb-2 rounded max-h-40 object-contain border" />
+                      )}
+                      <p className="text-xs md:text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
+                      {/* زر إدخال مفتاح جديد عند الخطأ في المفتاح */}
+                      {isErrorApiKeyMsg && showApiKeyErrorAction && (
+                        <button
+                          onClick={() => setShowApiInput(true)}
+                          className="mt-2 bg-red-600 hover:bg-red-700 text-white rounded px-3 py-1 text-xs transition-colors"
+                        >
+                          {language === "ar" ? "تغيير مفتاح Perplexity" : "Changer la clé Perplexity"}
+                        </button>
+                      )}
+                      {/* إذا هي رسالة البوت وتخص التواصل/واتساب, أظهر زر الفتح */}
+                      {message.isBot && isContactIntent(message.text) && (
+                        <a
+                          href={`https://wa.me/${WHATSAPP_NUMBER.replace('+', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-3 py-1 mt-2 text-white bg-green-600 hover:bg-green-700 rounded shadow transition space-x-1"
+                        >
+                          <MessageSquare size={16} />
+                          <span>{language === "ar" ? "تواصل عبر واتساب" : "Contacter via WhatsApp"}</span>
+                        </a>
+                      )}
+                      <div className={`text-xs mt-1 ${message.isBot ? 'text-gray-500' : 'text-blue-100'}`}>
+                        {message.timestamp.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' })}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
 
             {isTyping && (
               <div className="flex justify-start animate-fade-in">
