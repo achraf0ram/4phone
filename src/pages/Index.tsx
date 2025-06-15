@@ -39,6 +39,26 @@ interface IndexProps {
   onLanguageChange: (lang: string) => void;
 }
 
+// إضافة دالة توليد وصف alt للصور (مع دعم اللغتين)
+function getAlt(image: { src: string }, index: number, language: Language): string {
+  const arabicAlts = [
+    "صورة منصة 4phone الرئيسية",
+    "عرض صورة إصلاح الهواتف",
+    "صورة بيع قطع الغيار",
+    "صورة الهواتف المستعملة"
+  ];
+  const frenchAlts = [
+    "Image principale de la plateforme 4phone",
+    "Visuel de réparation de téléphones",
+    "Image des pièces détachées à vendre",
+    "Visuel des téléphones d'occasion"
+  ];
+  // لو تم إضافة صور جديدة، نجعل لكل صورة وصف افتراضي مع رقمها.
+  return language === "ar"
+    ? arabicAlts[index] || `صورة ${index + 1} من السلايدر`
+    : frenchAlts[index] || `Image ${index + 1} du carrousel`;
+}
+
 const newsItemsAr = [
   "⚡ منصتك الشاملة لإصلاح الهواتف وبيع وشراء قطع الغيار الأصلية والهواتف المستعملة بأفضل الأسعار وأعلى جودة في الخدمة 📱💎",
   "🔥 4phone عروض حصرية في ",
@@ -127,13 +147,12 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
                 {carouselImages.map((image, index) => (
                   <CarouselItem key={index}>
                     <div className="relative">
-                      {/* وضع العنوان (alt) في زاوية الصورة أعلى يمين أو يسار حسب اللغة */}
                       <div className={`absolute top-2 ${language === 'ar' ? 'right-3' : 'left-3'} z-10 bg-white/80 px-3 py-1 rounded-lg text-sm font-medium shadow text-gray-900`}>
-                        {getAlt(image)}
+                        {getAlt(image, index, language)}
                       </div>
                       <img
                         src={image.src}
-                        alt={getAlt(image)}
+                        alt={getAlt(image, index, language)}
                         className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg bg-gray-300"
                         style={{backgroundColor:'#bbb'}}
                       />
