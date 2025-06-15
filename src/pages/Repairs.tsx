@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
+import Footer from '@/components/Footer';
 import { Phone, Wrench, ShoppingCart, Star, Clock, Shield, MessageSquare, AlertCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -324,6 +324,9 @@ const Repairs: React.FC<RepairsProps> = ({ language, onLanguageChange }) => {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer language={language} />
     </div>
   );
 };
