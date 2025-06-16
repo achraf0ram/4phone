@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import Repairs from "./pages/Repairs";
 import Parts from "./pages/Parts";
 import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,7 +33,15 @@ const App = () => {
             <Route path="/" element={<Index language={language} onLanguageChange={handleLanguageChange} />} />
             <Route path="/repairs" element={<Repairs language={language} onLanguageChange={handleLanguageChange} />} />
             <Route path="/parts" element={<Parts language={language} onLanguageChange={handleLanguageChange} />} />
-            <Route path="/dashboard" element={<Dashboard language={language} onLanguageChange={handleLanguageChange} />} />
+            <Route path="/login" element={<Login />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard language={language} onLanguageChange={handleLanguageChange} />
+                </ProtectedRoute>
+              } 
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
