@@ -13,61 +13,25 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Edit, Trash2, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Loader2 } from 'lucide-react';
+import { usePartsInventory } from '@/hooks/usePartsInventory';
 
 interface PartsInventoryProps {
   language: Language;
 }
 
 const PartsInventory: React.FC<PartsInventoryProps> = ({ language }) => {
-  const [parts, setParts] = useState([
-    {
-      id: 1,
-      name: 'شاشة iPhone 14 Pro',
-      category: 'شاشات',
-      price: 800,
-      stock: 15,
-      minStock: 5,
-      status: 'in_stock'
-    },
-    {
-      id: 2,
-      name: 'بطارية Samsung Galaxy S23',
-      category: 'بطاريات',
-      price: 200,
-      stock: 3,
-      minStock: 5,
-      status: 'low_stock'
-    },
-    {
-      id: 3,
-      name: 'كاميرا iPhone 13',
-      category: 'كاميرات',
-      price: 450,
-      stock: 0,
-      minStock: 3,
-      status: 'out_of_stock'
-    },
-    {
-      id: 4,
-      name: 'مكبر صوت Xiaomi Mi 11',
-      category: 'مكبرات صوت',
-      price: 120,
-      stock: 8,
-      minStock: 3,
-      status: 'in_stock'
-    }
-  ]);
-
+  const { parts, loading, addPart, updatePartStock, deletePart } = usePartsInventory();
+  
   const [newPart, setNewPart] = useState({
     name: '',
     category: '',
     price: '',
     stock: '',
-    minStock: ''
+    min_stock: ''
   });
 
-  const [editingPart, setEditingPart] = useState<number | null>(null);
+  const [editingPart, setEditingPart] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
   const getStatusBadge = (status: string) => {
@@ -95,47 +59,32 @@ const PartsInventory: React.FC<PartsInventoryProps> = ({ language }) => {
     );
   };
 
-  const handleAddPart = () => {
+  const handleAddPart = async () => {
     if (newPart.name && newPart.category && newPart.price && newPart.stock) {
-      const stock = parseInt(newPart.stock);
-      const minStock = parseInt(newPart.minStock) || 5;
-      
-      let status = 'in_stock';
-      if (stock === 0) status = 'out_of_stock';
-      else if (stock <= minStock) status = 'low_stock';
-
-      const part = {
-        id: Date.now(),
+      const partData = {
         name: newPart.name,
         category: newPart.category,
-        price: parseInt(newPart.price),
-        stock: stock,
-        minStock: minStock,
-        status: status
+        price: parseFloat(newPart.price),
+        stock: parseInt(newPart.stock),
+        min_stock: parseInt(newPart.min_stock) || 5
       };
 
-      setParts([...parts, part]);
-      setNewPart({ name: '', category: '', price: '', stock: '', minStock: '' });
-      setShowAddForm(false);
+      const result = await addPart(partData);
+      if (result) {
+        setNewPart({ name: '', category: '', price: '', stock: '', min_stock: '' });
+        setShowAddForm(false);
+      }
     }
   };
 
-  const handleDeletePart = (id: number) => {
-    setParts(parts.filter(part => part.id !== id));
-  };
-
-  const handleUpdateStock = (id: number, newStock: number) => {
-    setParts(parts.map(part => {
-      if (part.id === id) {
-        let status = 'in_stock';
-        if (newStock === 0) status = 'out_of_stock';
-        else if (newStock <= part.minStock) status = 'low_stock';
-        
-        return { ...part, stock: newStock, status };
-      }
-      return part;
-    }));
-  };
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">{language === 'ar' ? 'جاري التحميل...' : 'Chargement...'}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -269,12 +218,12 @@ const PartsInventory: React.FC<PartsInventoryProps> = ({ language }) => {
                       defaultValue={part.stock}
                       className="w-20"
                       onBlur={(e) => {
-                        handleUpdateStock(part.id, parseInt(e.target.value) || 0);
+                        updatePartStock(part.id, parseInt(e.target.value) || 0);
                         setEditingPart(null);
                       }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter') {
-                          handleUpdateStock(part.id, parseInt((e.target as HTMLInputElement).value) || 0);
+                          updatePartStock(part.id, parseInt((e.target as HTMLInputElement).value) || 0);
                           setEditingPart(null);
                         }
                       }}
@@ -288,7 +237,7 @@ const PartsInventory: React.FC<PartsInventoryProps> = ({ language }) => {
                     </span>
                   )}
                 </TableCell>
-                <TableCell>{part.minStock}</TableCell>
+                <TableCell>{part.min_stock}</TableCell>
                 <TableCell>{getStatusBadge(part.status)}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
@@ -302,7 +251,7 @@ const PartsInventory: React.FC<PartsInventoryProps> = ({ language }) => {
                     <Button 
                       size="sm" 
                       variant="destructive"
-                      onClick={() => handleDeletePart(part.id)}
+                      onClick={() => deletePart(part.id)}
                     >
                       <Trash2 size={16} />
                     </Button>

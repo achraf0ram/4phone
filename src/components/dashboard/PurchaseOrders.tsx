@@ -1,7 +1,6 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Language } from '@/utils/translations';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -12,49 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Eye, Truck, Check, Package } from 'lucide-react';
+import { Eye, Truck, Check, Package, Loader2 } from 'lucide-react';
+import { usePurchaseOrders } from '@/hooks/usePurchaseOrders';
 
 interface PurchaseOrdersProps {
   language: Language;
 }
 
 const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ language }) => {
-  const [orders, setOrders] = useState([
-    {
-      id: 1,
-      customerName: 'سارة أحمد',
-      phone: '0612345678',
-      items: [
-        { name: 'شاشة iPhone 14', quantity: 1, price: 800 },
-        { name: 'بطارية iPhone 14', quantity: 1, price: 200 }
-      ],
-      total: 1000,
-      status: 'pending',
-      date: '2024-01-15'
-    },
-    {
-      id: 2,
-      customerName: 'محمد الكريم',
-      phone: '0623456789',
-      items: [
-        { name: 'Samsung Galaxy S23 Screen', quantity: 1, price: 600 }
-      ],
-      total: 600,
-      status: 'processing',
-      date: '2024-01-14'
-    },
-    {
-      id: 3,
-      customerName: 'عائشة المغربي',
-      phone: '0634567890',
-      items: [
-        { name: 'iPhone 13 Camera', quantity: 1, price: 400 }
-      ],
-      total: 400,
-      status: 'shipped',
-      date: '2024-01-13'
-    }
-  ]);
+  const { orders, loading, updateOrderStatus } = usePurchaseOrders();
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -91,11 +56,14 @@ const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ language }) => {
     );
   };
 
-  const handleStatusUpdate = (id: number, newStatus: string) => {
-    setOrders(orders.map(order => 
-      order.id === id ? { ...order, status: newStatus } : order
-    ));
-  };
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">{language === 'ar' ? 'جاري التحميل...' : 'Chargement...'}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -122,12 +90,12 @@ const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ language }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {orders.map((order, index) => (
               <TableRow key={order.id}>
-                <TableCell className="font-medium">#{order.id.toString().padStart(4, '0')}</TableCell>
+                <TableCell className="font-medium">#{(index + 1).toString().padStart(4, '0')}</TableCell>
                 <TableCell>
                   <div>
-                    <div className="font-medium">{order.customerName}</div>
+                    <div className="font-medium">{order.customer_name}</div>
                     <div className="text-sm text-gray-600">{order.phone}</div>
                   </div>
                 </TableCell>
@@ -142,7 +110,7 @@ const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ language }) => {
                 </TableCell>
                 <TableCell className="font-medium">{order.total} درهم</TableCell>
                 <TableCell>{getStatusBadge(order.status)}</TableCell>
-                <TableCell>{order.date}</TableCell>
+                <TableCell>{new Date(order.created_at).toLocaleDateString('ar-MA')}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline">
@@ -152,7 +120,7 @@ const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ language }) => {
                       <Button 
                         size="sm" 
                         variant="default"
-                        onClick={() => handleStatusUpdate(order.id, 'processing')}
+                        onClick={() => updateOrderStatus(order.id, 'processing')}
                       >
                         {language === 'ar' ? 'تأكيد' : 'Confirmer'}
                       </Button>
@@ -161,7 +129,7 @@ const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ language }) => {
                       <Button 
                         size="sm" 
                         variant="default"
-                        onClick={() => handleStatusUpdate(order.id, 'shipped')}
+                        onClick={() => updateOrderStatus(order.id, 'shipped')}
                       >
                         <Truck size={16} />
                         {language === 'ar' ? 'شحن' : 'Expédier'}

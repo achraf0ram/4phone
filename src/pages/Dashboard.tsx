@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -23,6 +22,11 @@ import PurchaseOrders from '@/components/dashboard/PurchaseOrders';
 import UsedPhones from '@/components/dashboard/UsedPhones';
 import PartsInventory from '@/components/dashboard/PartsInventory';
 import DashboardStats from '@/components/dashboard/DashboardStats';
+import { useRepairRequests } from '@/hooks/useRepairRequests';
+import { usePurchaseOrders } from '@/hooks/usePurchaseOrders';
+import { useUsedPhones } from '@/hooks/useUsedPhones';
+import { usePartsInventory } from '@/hooks/usePartsInventory';
+import { useAuth } from '@/hooks/useAuth';
 
 interface DashboardProps {
   language: Language;
@@ -34,19 +38,24 @@ type DashboardTab = 'overview' | 'repairs' | 'orders' | 'phones' | 'parts';
 const Dashboard: React.FC<DashboardProps> = ({ language, onLanguageChange }) => {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const adminUser = localStorage.getItem('adminUser') || 'Admin';
 
+  // Get real-time data from hooks
+  const { requests } = useRepairRequests();
+  const { orders } = usePurchaseOrders();
+  const { phones } = useUsedPhones();
+  const { parts } = usePartsInventory();
+
   const stats = {
-    repairs: 5,
-    orders: 12,
-    phones: 8,
-    parts: 24
+    repairs: requests.length,
+    orders: orders.length,
+    phones: phones.length,
+    parts: parts.length
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('adminUser');
-    toast.success(language === 'ar' ? 'تم تسجيل الخروج بنجاح' : 'Déconnexion réussie');
+    logout();
     navigate('/login');
   };
 
@@ -101,16 +110,16 @@ const Dashboard: React.FC<DashboardProps> = ({ language, onLanguageChange }) => 
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                     <div>
-                      <p className="font-medium">{language === 'ar' ? 'طلب إصلاح جديد' : 'Nouvelle demande de réparation'}</p>
-                      <p className="text-sm text-gray-600">{language === 'ar' ? 'iPhone 14 Pro - شاشة مكسورة' : 'iPhone 14 Pro - Écran cassé'}</p>
+                      <p className="font-medium">{language === 'ar' ? 'البيانات متصلة بقاعدة البيانات' : 'Données connectées à la base'}</p>
+                      <p className="text-sm text-gray-600">{language === 'ar' ? 'جميع البيانات الآن حقيقية ومتزامنة' : 'Toutes les données sont réelles et synchronisées'}</p>
                     </div>
                     <Badge>جديد</Badge>
                   </div>
                   
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                     <div>
-                      <p className="font-medium">{language === 'ar' ? 'طلب شراء مكتمل' : 'Commande d\'achat terminée'}</p>
-                      <p className="text-sm text-gray-600">{language === 'ar' ? 'بطارية Samsung Galaxy S23' : 'Batterie Samsung Galaxy S23'}</p>
+                      <p className="font-medium">{language === 'ar' ? 'تم ربط المنصة بـ Supabase' : 'Plateforme connectée à Supabase'}</p>
+                      <p className="text-sm text-gray-600">{language === 'ar' ? 'قاعدة بيانات آمنة وموثوقة' : 'Base de données sécurisée et fiable'}</p>
                     </div>
                     <Badge variant="outline">مكتمل</Badge>
                   </div>
@@ -127,21 +136,21 @@ const Dashboard: React.FC<DashboardProps> = ({ language, onLanguageChange }) => 
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>{language === 'ar' ? 'الطلبات المعلقة' : 'Commandes en attente'}</span>
-                      <span className="font-semibold">3</span>
+                      <span>{language === 'ar' ? 'طلبات الإصلاح النشطة' : 'Réparations actives'}</span>
+                      <span className="font-semibold">{requests.filter(r => r.status === 'pending' || r.status === 'in_progress').length}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '25%' }}></div>
+                      <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(requests.filter(r => r.status === 'pending' || r.status === 'in_progress').length / Math.max(requests.length, 1)) * 100}%` }}></div>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>{language === 'ar' ? 'الطلبات المكتملة' : 'Commandes terminées'}</span>
-                      <span className="font-semibold">9</span>
+                      <span>{language === 'ar' ? 'طلبات الشراء المعلقة' : 'Commandes en attente'}</span>
+                      <span className="font-semibold">{orders.filter(o => o.status === 'pending').length}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{ width: '75%' }}></div>
+                      <div className="bg-orange-500 h-2 rounded-full" style={{ width: `${(orders.filter(o => o.status === 'pending').length / Math.max(orders.length, 1)) * 100}%` }}></div>
                     </div>
                   </div>
                 </CardContent>
@@ -175,8 +184,8 @@ const Dashboard: React.FC<DashboardProps> = ({ language, onLanguageChange }) => 
             </h1>
             <p className="text-gray-600">
               {language === 'ar' 
-                ? `مرحباً ${adminUser} - إدارة جميع عمليات المتجر والطلبات` 
-                : `Bonjour ${adminUser} - Gérer toutes les opérations du magasin`
+                ? `مرحباً ${adminUser} - منصة متكاملة مع قاعدة البيانات` 
+                : `Bonjour ${adminUser} - Plateforme intégrée avec base de données`
               }
             </p>
           </div>

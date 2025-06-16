@@ -13,51 +13,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Eye, Check, X, Plus, Edit, Trash2 } from 'lucide-react';
+import { Eye, Check, X, Plus, Trash2, Loader2 } from 'lucide-react';
+import { useUsedPhones } from '@/hooks/useUsedPhones';
 
 interface UsedPhonesProps {
   language: Language;
 }
 
 const UsedPhones: React.FC<UsedPhonesProps> = ({ language }) => {
-  const [phones, setPhones] = useState([
-    {
-      id: 1,
-      customerName: 'خالد الزهراني',
-      phone: '0612345678',
-      deviceModel: 'iPhone 12 Pro',
-      condition: 'ممتاز',
-      offerPrice: 3500,
-      status: 'pending',
-      date: '2024-01-15'
-    },
-    {
-      id: 2,
-      customerName: 'نورا السعدي',
-      phone: '0623456789',
-      deviceModel: 'Samsung Galaxy S22',
-      condition: 'جيد',
-      offerPrice: 2200,
-      status: 'approved',
-      date: '2024-01-14'
-    },
-    {
-      id: 3,
-      customerName: 'عبدالله المنصوري',
-      phone: '0634567890',
-      deviceModel: 'iPhone 11',
-      condition: 'متوسط',
-      offerPrice: 1800,
-      status: 'in_inventory',
-      date: '2024-01-13'
-    }
-  ]);
-
+  const { phones, loading, updatePhoneStatus, addPhone, deletePhone } = useUsedPhones();
+  
   const [newPhone, setNewPhone] = useState({
-    model: '',
+    device_model: '',
     condition: '',
-    price: '',
-    description: ''
+    offer_price: '',
+    customer_name: 'إدارة المتجر',
+    phone: ''
   });
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -91,33 +62,33 @@ const UsedPhones: React.FC<UsedPhonesProps> = ({ language }) => {
     );
   };
 
-  const handleStatusUpdate = (id: number, newStatus: string) => {
-    setPhones(phones.map(phone => 
-      phone.id === id ? { ...phone, status: newStatus } : phone
-    ));
-  };
-
-  const handleAddPhone = () => {
-    if (newPhone.model && newPhone.condition && newPhone.price) {
-      const phone = {
-        id: Date.now(),
-        customerName: 'إدارة المتجر',
-        phone: '',
-        deviceModel: newPhone.model,
+  const handleAddPhone = async () => {
+    if (newPhone.device_model && newPhone.condition && newPhone.offer_price) {
+      const phoneData = {
+        device_model: newPhone.device_model,
         condition: newPhone.condition,
-        offerPrice: parseInt(newPhone.price),
-        status: 'in_inventory',
-        date: new Date().toISOString().split('T')[0]
+        offer_price: parseFloat(newPhone.offer_price),
+        customer_name: newPhone.customer_name,
+        phone: newPhone.phone,
+        status: 'in_inventory' as const
       };
-      setPhones([...phones, phone]);
-      setNewPhone({ model: '', condition: '', price: '', description: '' });
-      setShowAddForm(false);
+      
+      const result = await addPhone(phoneData);
+      if (result) {
+        setNewPhone({ device_model: '', condition: '', offer_price: '', customer_name: 'إدارة المتجر', phone: '' });
+        setShowAddForm(false);
+      }
     }
   };
 
-  const handleDeletePhone = (id: number) => {
-    setPhones(phones.filter(phone => phone.id !== id));
-  };
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">{language === 'ar' ? 'جاري التحميل...' : 'Chargement...'}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -143,8 +114,8 @@ const UsedPhones: React.FC<UsedPhonesProps> = ({ language }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Input
                 placeholder={language === 'ar' ? 'موديل الهاتف' : 'Modèle du téléphone'}
-                value={newPhone.model}
-                onChange={(e) => setNewPhone({...newPhone, model: e.target.value})}
+                value={newPhone.device_model}
+                onChange={(e) => setNewPhone({...newPhone, device_model: e.target.value})}
               />
               <Input
                 placeholder={language === 'ar' ? 'الحالة' : 'État'}
@@ -154,8 +125,8 @@ const UsedPhones: React.FC<UsedPhonesProps> = ({ language }) => {
               <Input
                 type="number"
                 placeholder={language === 'ar' ? 'السعر' : 'Prix'}
-                value={newPhone.price}
-                onChange={(e) => setNewPhone({...newPhone, price: e.target.value})}
+                value={newPhone.offer_price}
+                onChange={(e) => setNewPhone({...newPhone, offer_price: e.target.value})}
               />
               <div className="flex gap-2">
                 <Button onClick={handleAddPhone} size="sm">
@@ -188,17 +159,17 @@ const UsedPhones: React.FC<UsedPhonesProps> = ({ language }) => {
               <TableRow key={phone.id}>
                 <TableCell>
                   <div>
-                    <div className="font-medium">{phone.customerName}</div>
+                    <div className="font-medium">{phone.customer_name || '-'}</div>
                     {phone.phone && (
                       <div className="text-sm text-gray-600">{phone.phone}</div>
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="font-medium">{phone.deviceModel}</TableCell>
+                <TableCell className="font-medium">{phone.device_model}</TableCell>
                 <TableCell>{phone.condition}</TableCell>
-                <TableCell className="font-medium">{phone.offerPrice} درهم</TableCell>
+                <TableCell className="font-medium">{phone.offer_price} درهم</TableCell>
                 <TableCell>{getStatusBadge(phone.status)}</TableCell>
-                <TableCell>{phone.date}</TableCell>
+                <TableCell>{new Date(phone.created_at).toLocaleDateString('ar-MA')}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline">
@@ -209,14 +180,14 @@ const UsedPhones: React.FC<UsedPhonesProps> = ({ language }) => {
                         <Button 
                           size="sm" 
                           variant="default"
-                          onClick={() => handleStatusUpdate(phone.id, 'approved')}
+                          onClick={() => updatePhoneStatus(phone.id, 'approved')}
                         >
                           <Check size={16} />
                         </Button>
                         <Button 
                           size="sm" 
                           variant="destructive"
-                          onClick={() => handleStatusUpdate(phone.id, 'rejected')}
+                          onClick={() => updatePhoneStatus(phone.id, 'rejected')}
                         >
                           <X size={16} />
                         </Button>
@@ -226,7 +197,7 @@ const UsedPhones: React.FC<UsedPhonesProps> = ({ language }) => {
                       <Button 
                         size="sm" 
                         variant="default"
-                        onClick={() => handleStatusUpdate(phone.id, 'in_inventory')}
+                        onClick={() => updatePhoneStatus(phone.id, 'in_inventory')}
                       >
                         {language === 'ar' ? 'أضافة للمخزون' : 'Ajouter au stock'}
                       </Button>
@@ -234,7 +205,7 @@ const UsedPhones: React.FC<UsedPhonesProps> = ({ language }) => {
                     <Button 
                       size="sm" 
                       variant="destructive"
-                      onClick={() => handleDeletePhone(phone.id)}
+                      onClick={() => deletePhone(phone.id)}
                     >
                       <Trash2 size={16} />
                     </Button>

@@ -9,7 +9,168 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          password_hash: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          password_hash: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          password_hash?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      parts_inventory: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          min_stock: number
+          name: string
+          price: number
+          status: string
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          min_stock?: number
+          name: string
+          price: number
+          status?: string
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          min_stock?: number
+          name?: string
+          price?: number
+          status?: string
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      purchase_orders: {
+        Row: {
+          created_at: string
+          customer_name: string
+          id: string
+          items: Json
+          phone: string
+          status: string
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_name: string
+          id?: string
+          items: Json
+          phone: string
+          status?: string
+          total: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string
+          id?: string
+          items?: Json
+          phone?: string
+          status?: string
+          total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      repair_requests: {
+        Row: {
+          created_at: string
+          customer_name: string
+          device_model: string
+          estimated_cost: number | null
+          id: string
+          phone: string
+          problem: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_name: string
+          device_model: string
+          estimated_cost?: number | null
+          id?: string
+          phone: string
+          problem: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string
+          device_model?: string
+          estimated_cost?: number | null
+          id?: string
+          phone?: string
+          problem?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      used_phones: {
+        Row: {
+          condition: string
+          created_at: string
+          customer_name: string | null
+          device_model: string
+          id: string
+          offer_price: number
+          phone: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          condition: string
+          created_at?: string
+          customer_name?: string | null
+          device_model: string
+          id?: string
+          offer_price: number
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          condition?: string
+          created_at?: string
+          customer_name?: string | null
+          device_model?: string
+          id?: string
+          offer_price?: number
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

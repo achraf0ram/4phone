@@ -5,32 +5,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from 'sonner';
 import { Eye, EyeOff, Lock, User } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login, loading } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
-    // محاكاة تسجيل الدخول
-    setTimeout(() => {
-      if (username === 'admin' && password === '123456') {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('adminUser', username);
-        toast.success('تم تسجيل الدخول بنجاح!');
-        navigate('/dashboard');
-      } else {
-        toast.error('اسم المستخدم أو كلمة المرور غير صحيحة');
-      }
-      setIsLoading(false);
-    }, 1000);
+    const success = await login(username, password);
+    if (success) {
+      navigate('/dashboard');
+    }
   };
 
   return (
@@ -94,9 +85,9 @@ const Login = () => {
             <Button 
               type="submit" 
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              disabled={isLoading}
+              disabled={loading}
             >
-              {isLoading ? (
+              {loading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   جاري تسجيل الدخول...

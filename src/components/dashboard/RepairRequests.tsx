@@ -1,7 +1,6 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Language } from '@/utils/translations';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -12,45 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Eye, Check, X, Clock } from 'lucide-react';
+import { Eye, Check, X, Clock, Loader2 } from 'lucide-react';
+import { useRepairRequests } from '@/hooks/useRepairRequests';
 
 interface RepairRequestsProps {
   language: Language;
 }
 
 const RepairRequests: React.FC<RepairRequestsProps> = ({ language }) => {
-  const [requests, setRequests] = useState([
-    {
-      id: 1,
-      customerName: 'أحمد محمد',
-      phone: '0612345678',
-      deviceModel: 'iPhone 14 Pro',
-      problem: 'شاشة مكسورة',
-      status: 'pending',
-      date: '2024-01-15',
-      estimatedCost: 800
-    },
-    {
-      id: 2,
-      customerName: 'فاطمة العلوي',
-      phone: '0623456789',
-      deviceModel: 'Samsung Galaxy S23',
-      problem: 'بطارية لا تشحن',
-      status: 'in_progress',
-      date: '2024-01-14',
-      estimatedCost: 350
-    },
-    {
-      id: 3,
-      customerName: 'يوسف الحسني',
-      phone: '0634567890',
-      deviceModel: 'iPhone 13',
-      problem: 'مشكلة في الكاميرا',
-      status: 'completed',
-      date: '2024-01-13',
-      estimatedCost: 500
-    }
-  ]);
+  const { requests, loading, updateRequestStatus } = useRepairRequests();
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -82,11 +51,14 @@ const RepairRequests: React.FC<RepairRequestsProps> = ({ language }) => {
     );
   };
 
-  const handleStatusUpdate = (id: number, newStatus: string) => {
-    setRequests(requests.map(req => 
-      req.id === id ? { ...req, status: newStatus } : req
-    ));
-  };
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">{language === 'ar' ? 'جاري التحميل...' : 'Chargement...'}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -115,12 +87,12 @@ const RepairRequests: React.FC<RepairRequestsProps> = ({ language }) => {
           <TableBody>
             {requests.map((request) => (
               <TableRow key={request.id}>
-                <TableCell className="font-medium">{request.customerName}</TableCell>
+                <TableCell className="font-medium">{request.customer_name}</TableCell>
                 <TableCell>{request.phone}</TableCell>
-                <TableCell>{request.deviceModel}</TableCell>
+                <TableCell>{request.device_model}</TableCell>
                 <TableCell>{request.problem}</TableCell>
                 <TableCell>{getStatusBadge(request.status)}</TableCell>
-                <TableCell>{request.estimatedCost} درهم</TableCell>
+                <TableCell>{request.estimated_cost ? `${request.estimated_cost} درهم` : '-'}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline">
@@ -131,14 +103,14 @@ const RepairRequests: React.FC<RepairRequestsProps> = ({ language }) => {
                         <Button 
                           size="sm" 
                           variant="default"
-                          onClick={() => handleStatusUpdate(request.id, 'in_progress')}
+                          onClick={() => updateRequestStatus(request.id, 'in_progress')}
                         >
                           <Check size={16} />
                         </Button>
                         <Button 
                           size="sm" 
                           variant="destructive"
-                          onClick={() => handleStatusUpdate(request.id, 'rejected')}
+                          onClick={() => updateRequestStatus(request.id, 'rejected')}
                         >
                           <X size={16} />
                         </Button>
@@ -148,7 +120,7 @@ const RepairRequests: React.FC<RepairRequestsProps> = ({ language }) => {
                       <Button 
                         size="sm" 
                         variant="default"
-                        onClick={() => handleStatusUpdate(request.id, 'completed')}
+                        onClick={() => updateRequestStatus(request.id, 'completed')}
                       >
                         {language === 'ar' ? 'إكمال' : 'Terminer'}
                       </Button>
