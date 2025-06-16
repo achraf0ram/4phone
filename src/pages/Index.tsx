@@ -118,11 +118,11 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
    
           <h1 className="text-3xl md:text-5xl font-extrabold mb-6 flex flex-col items-center justify-center gap-4">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-green-500">
-             4phone اكتشف منصتك الأولى لإصلاح وبيع الهواتف;
+              اكتشف منصتك الأولى لإصلاح وبيع 
               <span
                 className="font-black"
                 style={{
-                  background: 'linear-gradient(90deg,#10b981 10%,#2563eb 70%,#f59e42 100%)',
+                  background: 'linear-gradient(90deg,#3b82f6 0%,#10b981 50%,#2563eb 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
