@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { Language } from '@/utils/translations';
 import { 
   Wrench, 
@@ -235,8 +234,6 @@ const Dashboard: React.FC<DashboardProps> = ({ language, onLanguageChange }) => 
           {renderTabContent()}
         </div>
       </div>
-
-      <Footer language={language} />
     </div>
   );
 };
