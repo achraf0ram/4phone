@@ -27,7 +27,7 @@ export const useUsedPhones = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setPhones(data || []);
+      setPhones((data || []) as UsedPhone[]);
     } catch (error) {
       console.error('Error fetching used phones:', error);
       toast.error('خطأ في تحميل الهواتف المستعملة');
@@ -65,7 +65,7 @@ export const useUsedPhones = () => {
       
       if (error) throw error;
       
-      setPhones(prev => [data, ...prev]);
+      setPhones(prev => [data as UsedPhone, ...prev]);
       toast.success('تم إضافة الهاتف بنجاح');
       return data;
     } catch (error) {
