@@ -118,7 +118,7 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
    
           <h1 className="text-3xl md:text-5xl font-extrabold mb-6 flex flex-col items-center justify-center gap-4">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-green-500">
-              اكتشف منصتك الأولى لإصلاح وبيع 
+               4phoneاكتشف منصتك الأولى لإصلاح وبيع 
               <span
                 className="font-black"
                 style={{
@@ -128,7 +128,7 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
                   backgroundClip: 'text'
                 }}
               >
-                4phone
+               
               </span>
             </span>
           </h1>
