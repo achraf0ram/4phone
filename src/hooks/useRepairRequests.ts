@@ -27,7 +27,7 @@ export const useRepairRequests = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setRequests(data || []);
+      setRequests((data || []) as RepairRequest[]);
     } catch (error) {
       console.error('Error fetching repair requests:', error);
       toast.error('خطأ في تحميل طلبات الإصلاح');
@@ -65,7 +65,7 @@ export const useRepairRequests = () => {
       
       if (error) throw error;
       
-      setRequests(prev => [data, ...prev]);
+      setRequests(prev => [data as RepairRequest, ...prev]);
       toast.success('تم إضافة طلب الإصلاح بنجاح');
       return data;
     } catch (error) {

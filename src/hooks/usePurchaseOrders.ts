@@ -26,7 +26,7 @@ export const usePurchaseOrders = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setOrders(data || []);
+      setOrders((data || []) as PurchaseOrder[]);
     } catch (error) {
       console.error('Error fetching purchase orders:', error);
       toast.error('خطأ في تحميل طلبات الشراء');
@@ -64,7 +64,7 @@ export const usePurchaseOrders = () => {
       
       if (error) throw error;
       
-      setOrders(prev => [data, ...prev]);
+      setOrders(prev => [data as PurchaseOrder, ...prev]);
       toast.success('تم إضافة طلب الشراء بنجاح');
       return data;
     } catch (error) {

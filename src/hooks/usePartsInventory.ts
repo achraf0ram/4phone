@@ -27,7 +27,7 @@ export const usePartsInventory = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setParts(data || []);
+      setParts((data || []) as Part[]);
     } catch (error) {
       console.error('Error fetching parts inventory:', error);
       toast.error('خطأ في تحميل مخزون قطع الغيار');
@@ -50,7 +50,7 @@ export const usePartsInventory = () => {
       
       if (error) throw error;
       
-      setParts(prev => [data, ...prev]);
+      setParts(prev => [data as Part, ...prev]);
       toast.success('تم إضافة قطعة الغيار بنجاح');
       return data;
     } catch (error) {
