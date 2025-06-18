@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import ServiceCard from '@/components/ServiceCard';
@@ -17,46 +17,25 @@ import useEmblaCarousel from 'embla-carousel-react';
 
 // صور السلايدر الجديدة
 const carouselImages = [
+
   {
-    src: "/lovable-uploads/e4725cdf-77c6-4294-bce9-5561debea0a2.png",
-   
+    src: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=400&fit=crop",
   },
   {
-    src: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop",
-  
+    src: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&h=400&fit=crop",
   },
   {
     src: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&h=400&fit=crop",
-
   },
   {
     src: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=400&fit=crop",
- 
-  }
+  },
 ];
+
+// Add interface for component props
 interface IndexProps {
   language: Language;
   onLanguageChange: (lang: string) => void;
-}
-
-// إضافة دالة توليد وصف alt للصور (مع دعم اللغتين)
-function getAlt(image: { src: string }, index: number, language: Language): string {
-  const arabicAlts = [
-    "صورة منصة 4phone الرئيسية",
-    "عرض صورة إصلاح الهواتف",
-    "صورة بيع قطع الغيار",
-    "صورة الهواتف المستعملة"
-  ];
-  const frenchAlts = [
-    "Image principale de la plateforme 4phone",
-    "Visuel de réparation de téléphones",
-    "Image des pièces détachées à vendre",
-    "Visuel des téléphones d'occasion"
-  ];
-  // لو تم إضافة صور جديدة، نجعل لكل صورة وصف افتراضي مع رقمها.
-  return language === "ar"
-    ? arabicAlts[index] || `صورة ${index + 1} من السلايدر`
-    : frenchAlts[index] || `Image ${index + 1} du carrousel`;
 }
 
 const newsItemsAr = [
@@ -80,7 +59,14 @@ const newsItemsFr = [
 const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
   const navigate = useNavigate();
   // carousel embla for autoplay
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true,
+    align: "start",
+    dragFree: false,
+    containScroll: "trimSnaps",
+    skipSnaps: false,
+    inViewThreshold: 0.7
+  });
   const autoplayInterval = useRef<NodeJS.Timeout | null>(null);
 
   // اختيار الأخبار حسب اللغة
@@ -98,12 +84,20 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
   // تفعيل تغيير الصور تلقائياً
   useEffect(() => {
     if (!emblaApi) return;
-    autoplayInterval.current && clearInterval(autoplayInterval.current as NodeJS.Timeout);
-    autoplayInterval.current = setInterval(() => {
-      if (emblaApi) emblaApi.scrollNext();
-    }, 3500);
+    
+    const autoplay = () => {
+      if (emblaApi) {
+        emblaApi.scrollNext();
+      }
+    };
+
+    // تغيير الصورة كل 3 ثواني
+    autoplayInterval.current = setInterval(autoplay, 3000);
+
     return () => {
-      if (autoplayInterval.current) clearInterval(autoplayInterval.current);
+      if (autoplayInterval.current) {
+        clearInterval(autoplayInterval.current);
+      }
     };
   }, [emblaApi]);
 
@@ -118,7 +112,11 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
    
           <h1 className="text-3xl md:text-5xl font-extrabold mb-6 flex flex-col items-center justify-center gap-4">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-green-500">
-               4phoneاكتشف منصتك الأولى لإصلاح وبيع 
+               
+               4phone اكتشف منصتك الأولى لإصلاح وبيع 
+               <br />
+               <br />
+              
               <span
                 className="font-black"
                 style={{
@@ -135,25 +133,26 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
         </div>
         
         {/* Carousel Section */}
-        <div className="mb-8 max-w-4xl mx-auto">
-          <div ref={emblaRef}>
+        <div className="mb-8 max-w-4xl mx-auto relative">
+          <div ref={emblaRef} className="overflow-hidden">
             <Carousel className="w-full"
               opts={{
                 align: "start",
-                loop: true
+                loop: true,
+                dragFree: false,
+                containScroll: "trimSnaps",
+                skipSnaps: false,
+                inViewThreshold: 0.7
               }}
             >
-              <CarouselContent>
+              <CarouselContent className="gap-0">
                 {carouselImages.map((image, index) => (
-                  <CarouselItem key={index}>
+                  <CarouselItem key={index} className="basis-full pl-0">
                     <div className="relative">
-                      <div className={`absolute top-2 ${language === 'ar' ? 'right-3' : 'left-3'} z-10 bg-white/80 px-3 py-1 rounded-lg text-sm font-medium shadow text-gray-900`}>
-                        {getAlt(image, index, language)}
-                      </div>
                       <img
                         src={image.src}
-                        alt={getAlt(image, index, language)}
-                        className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg bg-gray-300"
+                        alt=""
+                        className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg bg-gray-300 transition-all duration-500 ease-in-out"
                         style={{backgroundColor:'#bbb'}}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-20 rounded-xl pointer-events-none"></div>
@@ -161,8 +160,10 @@ const Index: React.FC<IndexProps> = ({ language, onLanguageChange }) => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="left-4" />
-              <CarouselNext className="right-4" />
+              <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-4">
+                <CarouselPrevious className="relative left-0 bg-white/80 hover:bg-white text-black border-none shadow-lg" />
+                <CarouselNext className="relative right-0 bg-white/80 hover:bg-white text-black border-none shadow-lg" />
+              </div>
             </Carousel>
           </div>
         </div>
