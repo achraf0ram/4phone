@@ -10,7 +10,8 @@ import {
   Settings,
   LogOut,
   Bell,
-  BarChart3
+  BarChart3,
+  Box
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,13 +27,14 @@ import { usePurchaseOrders } from '@/hooks/usePurchaseOrders';
 import { useUsedPhones } from '@/hooks/useUsedPhones';
 import { usePartsInventory } from '@/hooks/usePartsInventory';
 import { useAuth } from '@/hooks/useAuth';
+import ProductManagement from '@/components/dashboard/ProductManagement';
 
 interface DashboardProps {
   language: Language;
   onLanguageChange: (lang: string) => void;
 }
 
-type DashboardTab = 'overview' | 'repairs' | 'orders' | 'phones' | 'parts';
+type DashboardTab = 'overview' | 'repairs' | 'orders' | 'phones' | 'parts' | 'products';
 
 const Dashboard: React.FC<DashboardProps> = ({ language, onLanguageChange }) => {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
@@ -45,12 +47,14 @@ const Dashboard: React.FC<DashboardProps> = ({ language, onLanguageChange }) => 
   const { orders } = usePurchaseOrders();
   const { phones } = useUsedPhones();
   const { parts } = usePartsInventory();
+  const [products, setProducts] = useState<any[]>([]);
 
   const stats = {
     repairs: requests.length,
     orders: orders.length,
     phones: phones.length,
-    parts: parts.length
+    parts: parts.length,
+    products: products.length
   };
 
   const handleLogout = () => {
@@ -88,6 +92,12 @@ const Dashboard: React.FC<DashboardProps> = ({ language, onLanguageChange }) => 
       label: language === 'ar' ? 'قطع الغيار' : 'Pièces détachées',
       icon: Package,
       count: stats.parts
+    },
+    {
+      id: 'products' as DashboardTab,
+      label: language === 'ar' ? 'إدارة المنتجات' : 'Gestion des produits',
+      icon: Box,
+      count: null
     }
   ];
 
@@ -165,6 +175,8 @@ const Dashboard: React.FC<DashboardProps> = ({ language, onLanguageChange }) => 
         return <UsedPhones language={language} />;
       case 'parts':
         return <PartsInventory language={language} />;
+      case 'products':
+        return <ProductManagement language={language} />;
       default:
         return null;
     }
